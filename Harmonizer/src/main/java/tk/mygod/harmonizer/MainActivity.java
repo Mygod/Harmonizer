@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.beep_button).setOnTouchListener(new android.view.View.OnTouchListener() {
+        findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
                 switch (motionevent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
                                 try {
                                     frequency = Double.parseDouble(((EditText) findViewById(R.id.frequencyText))
                                             .getText().toString());
-                                } catch (NumberFormatException exc) {
+                                } catch (Exception exc) {
                                     frequency = 1000;
                                 }
                                 if (savedFrequency != frequency) {
@@ -60,11 +60,11 @@ public class MainActivity extends Activity {
                                         savedTrack.release();
                                         savedTrack = null;
                                     }
-                                    ArrayList arraylist = new ArrayList((int) (44100D / frequency));
-                                    int max = (int) (44100D / frequency);
-                                    i = 0;
-                                    while (i < max) arraylist.add(Short.valueOf(generate()));
-                                    while (last != 0) arraylist.add(Short.valueOf(generate()));
+                                    int max = frequency <= 0 ? 2 : (int) (44100 / frequency);
+                                    if (max < 2) max = 2;
+                                    ArrayList arraylist = new ArrayList(max);
+                                    while (i < max) arraylist.add(generate());
+                                    while (last != 0) arraylist.add(generate());
                                     short[] samples = new short[--i];
                                     for (int j = 0; j < i; ++j) samples[j] = (Short) arraylist.get(j);
                                     arraylist.clear();
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
                         } finally {
                             try {
                                 if (reader != null) reader.close();
-                            } catch (Exception e) { }
+                            } catch (Exception ignored) { }
                         }
                         dialog.dismiss();
                         final String urlCopy = url;
