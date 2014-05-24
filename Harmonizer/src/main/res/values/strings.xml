@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Harmonizer</string>
+    <string name="welcoming_message">
+        Welcome to Harmonizer! This is the app where you can generate beep sounds to censor something weird like
+        *BEEP* and *BEEEEEEP*, etc.
+    </string>
+    <string name="frequency_hint">Frequency (Hz, default: 1000)</string>
+    <string name="beep">BEEP</string>
+    <string name="check_for_updates">Check for Updates</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="checking_for_updates">Checking for updates...</string>
+    <string name="update_available">Update available.</string>
+    <string name="no_update_available">No update available.</string>
+    <string name="check_for_updates_failed">An error occurred when trying to check for updates.</string>
+    <string name="go_to_download_page">Go to Download Page</string>
+    <string name="go_to_product_page">Go to Product Page</string>
+    <string name="close">Close</string>
+</resources>

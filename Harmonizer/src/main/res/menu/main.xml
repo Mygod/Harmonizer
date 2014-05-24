@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="tk.mygod.harmonizer.MainActivity" >
+
+    <item android:id="@+id/action_check_for_updates"
+          android:title="@string/check_for_updates"
+          android:icon="@drawable/ic_action_refresh"
+          android:orderInCategory="100"
+          android:showAsAction="ifRoom" />
+</menu>
