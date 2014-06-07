@@ -22,15 +22,49 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     private double savedFrequency;
-    private AudioTrack savedTrack;
+    private AudioTrack savedTrack, muteTrack;
     private boolean pressed;
 
     public MainActivity() {
     }
 
+    private static short generate(double frequency, int i) {
+        return (short) Math.round(32767 * Math.cos(3.14159265358979323846264338327950288 / 24000 * frequency * i));
+    }
+    private static AudioTrack generateTrack(double frequency)
+    {
+        int max = frequency <= 0 ? 2 : (int) (48000 / frequency), i = 0;
+        short last = 0;
+        if (max < 16) max = 16;
+        if (max > 2880000) max = 2880000;
+        ArrayList arraylist = new ArrayList(max);
+        while (i < max) arraylist.add(last = generate(frequency, i++));
+        while (i < 524288 && last < 32767) arraylist.add(last = generate(frequency, i++));  // 1M
+        while (i < 2880000 && last < 32760) arraylist.add(last = generate(frequency, i++)); // NO MORE THAN 60s
+        int k = i * 3 / 4, s = 0;
+        short[] samples = new short[--i];
+        for (int j = k; j < i; ++j) samples[s++] = (Short) arraylist.get(j);
+        for (int j = 0; j < k; ++j) samples[s++] = (Short) arraylist.get(j);
+        arraylist.clear();
+        AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
+                                          AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC);
+        track.write(samples, 0, i);
+        track.setLoopPoints(0, i, -1);
+        return track;
+    }
+
+    private void stop() {
+        pressed = false;
+        if (savedTrack != null) savedTrack.pause();
+    }
+
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
+        muteTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
+                                   AudioFormat.ENCODING_PCM_16BIT, 32, AudioTrack.MODE_STATIC);
+        muteTrack.write(new short[16], 0, 16);
+        muteTrack.setLoopPoints(0, 16, -1);
         findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
                 switch (motionevent.getAction()) {
@@ -38,13 +72,6 @@ public class MainActivity extends Activity {
                         pressed = true;
                         (new Thread(new Runnable() {
                             private double frequency;
-                            private int i;
-                            private short last;
-
-                            private short generate() {
-                                return last = (short) Math.round(32767 * Math.sin((3.14159265358979323846264338327950288
-                                        * frequency * (double) i++) / 22050));
-                            }
 
                             public void run() {
                                 try {
@@ -60,33 +87,32 @@ public class MainActivity extends Activity {
                                         savedTrack.release();
                                         savedTrack = null;
                                     }
-                                    int max = frequency <= 0 ? 2 : (int) (44100 / frequency);
-                                    if (max < 2) max = 2;
-                                    ArrayList arraylist = new ArrayList(max);
-                                    while (i < max) arraylist.add(generate());
-                                    while (last != 0) arraylist.add(generate());
-                                    short[] samples = new short[--i];
-                                    for (int j = 0; j < i; ++j) samples[j] = (Short) arraylist.get(j);
-                                    arraylist.clear();
-                                    AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100,
-                                            AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, i << 1,
-                                            AudioTrack.MODE_STATIC);
-                                    track.write(samples, 0, i);
-                                    track.setLoopPoints(0, i, -1);
-                                    savedTrack = track;
+                                    savedTrack = generateTrack(frequency);
                                 }
-                                if (pressed) savedTrack.play();
+                                if (savedTrack != null && pressed) savedTrack.play();
                             }
                         })).start();
                         return true;
                     case MotionEvent.ACTION_UP:
-                        pressed = false;
-                        if (savedTrack != null) savedTrack.pause();
+                        stop();
                         return true;
                 }
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        muteTrack.play();   // prevent start_output_stream delay
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        muteTrack.pause();
+        stop();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
