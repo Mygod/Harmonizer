@@ -9,9 +9,9 @@
                   android:layout_width="match_parent" android:layout_height="wrap_content" />
         <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
                   android:layout_height="wrap_content" android:layout_marginTop="16dip"
-                  android:ems="10" android:layout_below="@id/welcoming_text" android:inputType="numberDecimal"
-                  android:layout_alignParentStart="true" android:layout_alignEnd="@id/welcoming_text"
-                  android:hint="@string/frequency_hint" />
+                  android:ems="10" android:layout_below="@id/welcoming_text"
+                  android:inputType="numberDecimal|numberSigned" android:layout_alignParentStart="true"
+                  android:layout_alignEnd="@id/welcoming_text" android:hint="@string/frequency_hint" />
         <Button android:id="@+id/beep_button" android:layout_width="match_parent" android:layout_height="match_parent"
                 android:layout_marginTop="16dip" android:layout_below="@id/frequency_text"
                 android:text="@string/beep" />
