@@ -1,8 +1,0 @@
-<resources>
-    <!--
-        Default screen margins, per the Android Design guidelines.
-        Horizontal margin was bigger in order to prevent triggering both navigation drawer and the button.
-    -->
-    <dimen name="activity_horizontal_margin">20dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-</resources>

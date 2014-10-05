@@ -152,26 +152,28 @@ public class MainActivity extends Activity
         muteTrack.write(new short[16], 0, 16);
         muteTrack.setLoopPoints(0, 16, -1);
         frequencyText = (EditText) findViewById(R.id.frequency_text);
-        (drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout))
-                .setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        drawerLayout.setDrawerListener(drawerToggle = new ActionBarDrawerToggle
-                (this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
-            @Override
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getActionBar().setTitle(R.string.app_name);
-                addFavoriteMenu.setVisible(false);
-            }
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawerLayout != null) {
+            drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+            drawerLayout.setDrawerListener(drawerToggle = new ActionBarDrawerToggle
+                    (this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                @Override
+                public void onDrawerClosed(View view) {
+                    super.onDrawerClosed(view);
+                    getActionBar().setTitle(R.string.app_name);
+                    addFavoriteMenu.setVisible(false);
+                }
 
-            @Override
-            public void onDrawerOpened(View view) {
-                super.onDrawerOpened(view);
-                getActionBar().setTitle(R.string.favorites);
-                addFavoriteMenu.setVisible(true);
-            }
-        });
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+                @Override
+                public void onDrawerOpened(View view) {
+                    super.onDrawerOpened(view);
+                    getActionBar().setTitle(R.string.favorites);
+                    addFavoriteMenu.setVisible(true);
+                }
+            });
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
         ListView favoriteList = (ListView) findViewById(R.id.favorite);
         favoriteList.setEmptyView(findViewById(android.R.id.empty));
         favoriteList.setAdapter(favoritesAdapter = FavoritesAdapter.createAdapter(this));
@@ -211,13 +213,13 @@ public class MainActivity extends Activity
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        if (drawerToggle != null) drawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
+        if (drawerToggle != null) drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -225,13 +227,13 @@ public class MainActivity extends Activity
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.favorites, menu);
         (addFavoriteMenu = menu.findItem(R.id.add_to_favorites))
-                .setVisible(drawerLayout.isDrawerOpen(GravityCompat.START));
+                .setVisible(drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START));
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) return true;
+        if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) return true;
         if (item.getItemId() != R.id.add_to_favorites) return super.onOptionsItemSelected(item);
         final EditText text = new EditText(this);
         new AlertDialog.Builder(this).setTitle(R.string.add_favorite_dialog_title).setView(text)
@@ -264,7 +266,7 @@ public class MainActivity extends Activity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Object tag = view.getTag();
         if (tag instanceof Double) frequencyText.setText(betterToString((Double) tag));
-        drawerLayout.closeDrawers();
+        if (drawerLayout != null) drawerLayout.closeDrawers();
     }
 
     /**
