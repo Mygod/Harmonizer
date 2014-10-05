@@ -7,14 +7,16 @@
     </string>
     <string name="frequency_hint">Frequency (Hz, default: 1000)</string>
     <string name="beep">BEEP</string>
-    <string name="favorite_empty_hint">Press the add button to add the current frequency to your favorite list.
-        Long-press an item to remove it.</string>
     <string name="favorites">Favorites</string>
+    <string name="drawer_open">Favorites opened.</string>
+    <string name="drawer_close">Favorites closed.</string>
+    <string name="favorite_empty_hint">Press the add button to add the current frequency to your favorite list.
+        Long-press for more actions.</string>
     <string name="menu_add_to_favorites">Add to Favorites</string>
-    <string name="drawer_open">Drawer opened.</string>
-    <string name="drawer_close">Drawer closed.</string>
     <string name="add_favorite_dialog_title">Please enter the name:</string>
-    <string name="add_favorite_default_name">Untitled</string>
     <string name="favorite_context_menu_share">Share</string>
     <string name="favorite_context_menu_remove">Remove</string>
+    <string name="share_title">Send to...</string>
+    <string name="share_content">I go to the hills when my heart is lonely\nI know I will hear what I\'ve heard
+        before\nYour heart will be blessed with the sound of %s\nAnd you can sing using Harmonizer</string>
 </resources>

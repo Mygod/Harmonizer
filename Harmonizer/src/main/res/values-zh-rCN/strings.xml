@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">和谐器</string>
-    <string name="welcoming_message">
-        欢迎使用和谐器，和谐社会你我共同打造。此应用可用于生成嘀嘀的响声来屏蔽一些奇怪的东西，比如*嘀*、*嘀——*等。
-    </string>
-    <string name="frequency_hint">频率 (赫兹，默认：1000)</string>
-    <string name="beep">嘀</string>
-</resources>

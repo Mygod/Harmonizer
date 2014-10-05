@@ -3,6 +3,7 @@ package tk.mygod.harmonizer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.AudioFormat;
@@ -178,6 +179,7 @@ public class MainActivity extends ActionBarActivity
         favoriteList.setAdapter(favoritesAdapter = FavoritesAdapter.createAdapter(this));
         favoriteList.setOnItemClickListener(this);
         favoriteList.setOnItemLongClickListener(this);
+        registerForContextMenu(favoriteList);
         findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
                 switch (motionevent.getAction()) {
@@ -282,7 +284,30 @@ public class MainActivity extends ActionBarActivity
      */
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        favoritesAdapter.remove(favoritesAdapter.getItem(position));
         return false;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.favorite_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        FavoriteItem favorite = favoritesAdapter
+                .getItem(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position);
+        switch (item.getItemId()) {
+            case R.id.share:
+                startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content),
+                                favorite.getFullName())), getString(R.string.share_title)));
+                return true;
+            case R.id.remove:
+                favoritesAdapter.remove(favorite);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 }
