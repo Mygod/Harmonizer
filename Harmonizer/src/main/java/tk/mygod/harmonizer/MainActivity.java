@@ -1,5 +1,6 @@
 package tk.mygod.harmonizer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,12 +10,10 @@ import android.content.res.Configuration;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
@@ -22,7 +21,7 @@ import android.widget.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends Activity
         implements ListView.OnItemClickListener, ListView.OnItemLongClickListener {
     private static class FavoriteItem {
         public FavoriteItem(String name, double frequency) {
@@ -78,8 +77,7 @@ public class MainActivity extends ActionBarActivity
                 editor.remove(size + "_name");
                 editor.remove(size++ + "_freq");
             }
-            if (Build.VERSION.SDK_INT >= 9) editor.apply();
-            else editor.commit();
+            editor.apply();
         }
     }
 
@@ -161,19 +159,19 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle(R.string.app_name);
+                getActionBar().setTitle(R.string.app_name);
                 addFavoriteMenu.setVisible(false);
             }
 
             @Override
             public void onDrawerOpened(View view) {
                 super.onDrawerOpened(view);
-                getSupportActionBar().setTitle(R.string.favorites);
+                getActionBar().setTitle(R.string.favorites);
                 addFavoriteMenu.setVisible(true);
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
         ListView favoriteList = (ListView) findViewById(R.id.favorite);
         favoriteList.setEmptyView(findViewById(android.R.id.empty));
         favoriteList.setAdapter(favoritesAdapter = FavoritesAdapter.createAdapter(this));
