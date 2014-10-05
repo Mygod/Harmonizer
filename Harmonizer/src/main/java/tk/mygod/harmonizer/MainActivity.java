@@ -16,12 +16,6 @@ public class MainActivity extends Activity {
     private AudioTrack savedTrack, muteTrack;
     private boolean pressed;
 
-    public MainActivity() {
-    }
-
-    private static short generate(double frequency, int i) {
-        return (short) Math.round(32767 * Math.cos(3.14159265358979323846264338327950288 / 24000 * frequency * i));
-    }
     private static AudioTrack generateTrack(double frequency)
     {
         int max = frequency <= 0 ? 2 : (int) (48000 / frequency), i = 0;
@@ -29,13 +23,15 @@ public class MainActivity extends Activity {
         if (max < 16) max = 16;
         if (max > 2880000) max = 2880000;
         ArrayList<Short> arrayList = new ArrayList<Short>(max);
-        while (i < max) arrayList.add(last = generate(frequency, i++));
-        while (i < 524288 && last < 32767) arrayList.add(last = generate(frequency, i++));  // 1M
-        while (i < 2880000 && last < 32760) arrayList.add(last = generate(frequency, i++)); // NO MORE THAN 60s
-        int k = i * 3 / 4, s = 0;
+        double k = 3.14159265358979323846264338327950288 / 24000 * frequency;
+        while (i < max) arrayList.add((short) Math.round(32767 * Math.cos(k * i++)));
+        while (i < 524288 && last < 32767) arrayList.add(last = (short) Math.round(32767 * Math.cos(k * i++))); // 1M
+        // NO MORE THAN 60s
+        while (i < 2880000 && last < 32760) arrayList.add(last = (short) Math.round(32767 * Math.cos(k * i++)));
+        int delta = i * 3 / 4, s = 0;
         short[] samples = new short[--i];
-        for (int j = k; j < i; ++j) samples[s++] = arrayList.get(j);
-        for (int j = 0; j < k; ++j) samples[s++] = arrayList.get(j);
+        for (int j = delta; j < i; ++j) samples[s++] = arrayList.get(j);
+        for (int j = 0; j < delta; ++j) samples[s++] = arrayList.get(j);
         arrayList.clear();
         AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
                                           AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC);
@@ -61,7 +57,7 @@ public class MainActivity extends Activity {
                 switch (motionevent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         pressed = true;
-                        (new Thread(new Runnable() {
+                        (new Thread() {
                             private double frequency;
 
                             public void run() {
@@ -82,7 +78,7 @@ public class MainActivity extends Activity {
                                 }
                                 if (savedTrack != null && pressed) savedTrack.play();
                             }
-                        })).start();
+                        }).start();
                         return true;
                     case MotionEvent.ACTION_UP:
                         stop();
