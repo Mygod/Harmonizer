@@ -79,10 +79,10 @@ public class MainActivity extends Activity {
                                 if (savedTrack != null && pressed) savedTrack.play();
                             }
                         }).start();
-                        return true;
+                        break;
                     case MotionEvent.ACTION_UP:
                         stop();
-                        return true;
+                        break;
                 }
                 return false;
             }
