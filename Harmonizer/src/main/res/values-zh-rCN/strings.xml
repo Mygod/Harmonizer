@@ -6,13 +6,4 @@
     </string>
     <string name="frequency_hint">频率 (赫兹，默认：1000)</string>
     <string name="beep">嘀</string>
-    <string name="check_for_updates">检查更新</string>
-    <string name="please_wait">请稍等……</string>
-    <string name="checking_for_updates">检查更新中……</string>
-    <string name="update_available">有可用更新。</string>
-    <string name="no_update_available">无可用更新。</string>
-    <string name="check_for_updates_failed">检查更新失败。</string>
-    <string name="go_to_download_page">前往下载页面</string>
-    <string name="go_to_product_page">前往产品页面</string>
-    <string name="close">关闭</string>
 </resources>
