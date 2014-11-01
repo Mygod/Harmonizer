@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.1'
+        classpath 'com.android.tools.build:gradle:0.13.0'
     }
 }
 apply plugin: 'com.android.application'
@@ -13,17 +13,19 @@ repositories {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.0'
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 19
-        versionCode 298
-        versionName "1.1.3.298"
+        targetSdkVersion 21
+        versionCode 304
+        versionName "2.0.4.304"
     }
 }
 
 dependencies {
+    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:recyclerview-v7:+'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:20.+'
 }

@@ -1,6 +1,5 @@
 package tk.mygod.harmonizer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,18 +10,26 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-public class MainActivity extends Activity
-        implements ListView.OnItemClickListener, ListView.OnItemLongClickListener {
+public class MainActivity extends ActionBarActivity {
+    private static String betterToString(double value) {
+        return value == Math.floor(value) ? String.format("%.0f", value) : Double.toString(value);
+    }
+
     private static class FavoriteItem {
         public FavoriteItem(String name, double frequency) {
             Name = name;
@@ -36,39 +43,80 @@ public class MainActivity extends Activity
             return String.format("%s (%s Hz)", Name, betterToString(Frequency));
         }
     }
-    private static class FavoritesAdapter extends ArrayAdapter<FavoriteItem> {
-        public LinkedList<FavoriteItem> Favorites;
-        private SharedPreferences pref;
+    private class FavoriteItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private View view;
+        private TextView text;
+        private FavoriteItem item;
 
-        private FavoritesAdapter(Context context, LinkedList<FavoriteItem> objects) {
-            super(context, android.R.layout.simple_list_item_1, objects);
-            Favorites = objects;
+        public FavoriteItemViewHolder(View itemView) {
+            super(itemView);
+            text = (TextView) itemView.findViewById(android.R.id.text1);
+            itemView.setOnClickListener(this);
+            registerForContextMenu(view = itemView);
         }
 
-        public static FavoritesAdapter createAdapter(Context context) {
-            LinkedList<FavoriteItem> favorites = new LinkedList<FavoriteItem>();
-            FavoritesAdapter result = new FavoritesAdapter(context, favorites);
-            int size = (result.pref = context.getSharedPreferences("favorites", MODE_PRIVATE)).getInt("size", 0);
-            for (int i = 0; i < size; ++i) favorites.add(new FavoriteItem(result.pref.getString(i + "_name", ""),
-                    Double.longBitsToDouble(result.pref.getLong(i + "_freq", 0))));
-            return result;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) convertView = LayoutInflater.from(getContext())
-                                                        .inflate(android.R.layout.simple_list_item_1, parent, false);
-            FavoriteItem item = getItem(position);
-            ((TextView) convertView.findViewById(android.R.id.text1)).setText(item.getFullName());
-            convertView.setTag(item.Frequency);
-            return convertView;
+        public void bind(FavoriteItem item) {
+            text.setText((this.item = item).getFullName());
+            view.setTag(item);
         }
 
         @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
+        public void onClick(View v) {
+            frequencyText.setText(betterToString(item.Frequency));
+            if (drawerLayout != null) drawerLayout.closeDrawers();
+        }
+    }
+    private class FavoritesAdapter extends RecyclerView.Adapter<FavoriteItemViewHolder> {
+        private ArrayList<FavoriteItem> favorites;
+        private SharedPreferences pref;
+        private View empty;
+
+        public FavoritesAdapter() {
+            favorites = new ArrayList<FavoriteItem>();
+            empty = findViewById(android.R.id.empty);
+            int size = (pref = getSharedPreferences("favorites", MODE_PRIVATE)).getInt("size", 0);
+            if (size == 0) return;
+            empty.setVisibility(View.GONE);
+            for (int i = 0; i < size; ++i) favorites.add(new FavoriteItem(pref.getString(i + "_name", ""),
+                    Double.longBitsToDouble(pref.getLong(i + "_freq", 0))));
+        }
+
+        @Override
+        public FavoriteItemViewHolder onCreateViewHolder(ViewGroup vg, int i) {
+            return new FavoriteItemViewHolder(LayoutInflater.from(vg.getContext())
+                    .inflate(android.R.layout.simple_list_item_1, vg, false));
+        }
+
+        @Override
+        public void onBindViewHolder(FavoriteItemViewHolder vh, int i) {
+            vh.bind(favorites.get(i));
+        }
+
+        @Override
+        public int getItemCount() {
+            return favorites.size();
+        }
+
+        public void add(FavoriteItem item) {
+            int pos = favorites.size();
+            favorites.add(item);
+            update();
+            empty.setVisibility(View.GONE);
+            notifyItemInserted(pos);
+        }
+
+        public void remove(FavoriteItem item) {
+            int pos = favorites.indexOf(item);
+            favorites.remove(pos);
+            update();
+            notifyItemRemoved(pos);
+            if (favorites.size() == 0) empty.setVisibility(View.VISIBLE);
+        }
+
+        public void update() {
             int oldSize = pref.getInt("size", 0), size = 0;
             SharedPreferences.Editor editor = pref.edit();
-            for (FavoriteItem favorite : Favorites) {
+            for (FavoriteItem favorite : favorites) {
                 editor.putString(size + "_name", favorite.Name);
                 editor.putLong(size++ + "_freq", Double.doubleToLongBits(favorite.Frequency));
             }
@@ -89,10 +137,13 @@ public class MainActivity extends Activity
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private MenuItem addFavoriteMenu;
+    private FavoriteItem selectedItem;
 
-    private static String betterToString(double value) {
-        return value == Math.floor(value) ? String.format("%.0f", value) : Double.toString(value);
+    private void hideInput(TextView text) {
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                .hideSoftInputFromWindow(text.getWindowToken(), 0);
     }
+
     private double getFrequency() {
         try {
             return Double.parseDouble(frequencyText.getText().toString());
@@ -153,33 +204,32 @@ public class MainActivity extends Activity
         muteTrack.setLoopPoints(0, 16, -1);
         frequencyText = (EditText) findViewById(R.id.frequency_text);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (drawerLayout != null) {
             drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
             drawerLayout.setDrawerListener(drawerToggle = new ActionBarDrawerToggle
-                    (this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                    (this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
                 @Override
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
-                    getActionBar().setTitle(R.string.app_name);
+                    toolbar.setTitle(R.string.app_name);
                     addFavoriteMenu.setVisible(false);
                 }
 
                 @Override
                 public void onDrawerOpened(View view) {
                     super.onDrawerOpened(view);
-                    getActionBar().setTitle(R.string.favorites);
+                    toolbar.setTitle(R.string.favorites);
                     addFavoriteMenu.setVisible(true);
+                    hideInput(frequencyText);
                 }
             });
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setHomeButtonEnabled(true);
         }
-        ListView favoriteList = (ListView) findViewById(R.id.favorite);
-        favoriteList.setEmptyView(findViewById(android.R.id.empty));
-        favoriteList.setAdapter(favoritesAdapter = FavoritesAdapter.createAdapter(this));
-        favoriteList.setOnItemClickListener(this);
-        favoriteList.setOnItemLongClickListener(this);
-        registerForContextMenu(favoriteList);
+        RecyclerView favoriteList = (RecyclerView) findViewById(R.id.favorite);
+        favoriteList.setLayoutManager(new LinearLayoutManager(this));
+        favoriteList.setItemAnimator(new DefaultItemAnimator());
+        favoriteList.setAdapter(favoritesAdapter = new FavoritesAdapter());
         findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
                 switch (motionevent.getAction()) {
@@ -241,6 +291,7 @@ public class MainActivity extends Activity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         favoritesAdapter.add(new FavoriteItem(text.getText().toString(), getFrequency()));
+                        hideInput(text);
                     }
                 }).setNegativeButton(android.R.string.cancel, null).show();
         text.requestFocus();
@@ -249,62 +300,23 @@ public class MainActivity extends Activity
         return true;
     }
 
-    /**
-     * Callback method to be invoked when an item in this AdapterView has
-     * been clicked.
-     * <p/>
-     * Implementers can call getItemAtPosition(position) if they need
-     * to access the data associated with the selected item.
-     *
-     * @param parent   The AdapterView where the click happened.
-     * @param view     The view within the AdapterView that was clicked (this
-     *                 will be a view provided by the adapter)
-     * @param position The position of the view in the adapter.
-     * @param id       The row id of the item that was clicked.
-     */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Object tag = view.getTag();
-        if (tag instanceof Double) frequencyText.setText(betterToString((Double) tag));
-        if (drawerLayout != null) drawerLayout.closeDrawers();
-    }
-
-    /**
-     * Callback method to be invoked when an item in this view has been
-     * clicked and held.
-     * <p/>
-     * Implementers can call getItemAtPosition(position) if they need to access
-     * the data associated with the selected item.
-     *
-     * @param parent   The AbsListView where the click happened
-     * @param view     The view within the AbsListView that was clicked
-     * @param position The position of the view in the list
-     * @param id       The row id of the item that was clicked
-     * @return true if the callback consumed the long click, false otherwise
-     */
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return false;
-    }
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         getMenuInflater().inflate(R.menu.favorite_context_menu, menu);
+        selectedItem = (FavoriteItem) v.getTag();
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        FavoriteItem favorite = favoritesAdapter
-                .getItem(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position);
         switch (item.getItemId()) {
             case R.id.share:
                 startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
                         .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content),
-                                favorite.getFullName())), getString(R.string.share_title)));
+                                selectedItem.getFullName())), getString(R.string.share_title)));
                 return true;
             case R.id.remove:
-                favoritesAdapter.remove(favorite);
+                favoritesAdapter.remove(selectedItem);
                 return true;
             default:
                 return super.onContextItemSelected(item);

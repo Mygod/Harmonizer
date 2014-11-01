@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent" android:layout_height="match_parent">
-    <RelativeLayout android:layout_width="240dp" android:layout_height="match_parent" android:layout_gravity="start">
-        <ListView android:id="@+id/favorite" android:layout_width="match_parent" android:layout_height="match_parent"
-                  android:divider="@android:color/transparent" android:dividerHeight="0dp"
-                  android:choiceMode="singleChoice" />
-        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                  android:layout_marginLeft="20dp" android:layout_marginRight="20dp"
-                  android:layout_marginTop="16dp" android:layout_marginBottom="16dp"
-                  android:id="@android:id/empty" android:text="@string/favorite_empty_hint"/>
-    </RelativeLayout>
-    <RelativeLayout android:paddingLeft="20dp" android:paddingTop="16dp"
-                    android:paddingRight="20dp" android:paddingBottom="16dp"
-                    android:layout_width="match_parent" android:layout_height="match_parent">
-        <TextView android:id="@+id/welcoming_text" android:text="@string/welcoming_message"
-                  android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
-                  android:layout_height="wrap_content" android:layout_marginTop="16dip"
-                  android:ems="10" android:layout_below="@id/welcoming_text" android:inputType="numberDecimal"
-                  android:layout_alignParentStart="true" android:layout_alignEnd="@id/welcoming_text"
-                  android:hint="@string/frequency_hint" />
-        <Button android:id="@+id/beep_button" android:layout_width="match_parent" android:layout_height="match_parent"
-                android:layout_marginTop="16dip" android:layout_below="@id/frequency_text"
-                android:text="@string/beep" />
-    </RelativeLayout>
+    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+                                       android:layout_height="?attr/actionBarSize" android:layout_width="match_parent"
+                                       android:background="?attr/colorPrimary"
+                                       app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent">
+        <RelativeLayout android:layout_width="240dp" android:layout_height="match_parent"
+                        android:layout_gravity="start" android:background="#eee" android:clickable="true">
+            <android.support.v7.widget.RecyclerView android:id="@+id/favorite" android:layout_width="match_parent"
+                                                    android:layout_height="match_parent" />
+            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+                      android:layout_marginLeft="20dp" android:layout_marginRight="20dp"
+                      android:layout_marginTop="16dp" android:layout_marginBottom="16dp"
+                      android:id="@android:id/empty" android:text="@string/favorite_empty_hint"/>
+        </RelativeLayout>
+        <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:fillViewport="true">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:layout_margin="20dp">
+                    <TextView android:id="@+id/welcoming_text" android:text="@string/welcoming_message"
+                              android:layout_width="match_parent" android:layout_height="wrap_content" />
+                    <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
+                              android:layout_height="wrap_content" android:layout_marginTop="16dip"
+                              android:ems="10" android:layout_below="@id/welcoming_text"
+                              android:inputType="numberDecimal|numberSigned" android:hint="@string/frequency_hint"
+                              android:layout_alignParentStart="true" android:layout_alignEnd="@id/welcoming_text"
+                              android:layout_alignParentLeft="true" android:layout_alignRight="@id/welcoming_text" />
+                    <LinearLayout android:layout_marginTop="16dip"
+                                  android:layout_below="@id/frequency_text" android:minHeight="20sp"
+                                  android:layout_width="match_parent" android:layout_height="match_parent">
+                        <Button android:id="@+id/beep_button" android:text="@string/beep"
+                                android:layout_width="match_parent" android:layout_height="match_parent" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 </LinearLayout>
