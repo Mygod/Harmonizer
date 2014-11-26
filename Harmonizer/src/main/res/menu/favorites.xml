@@ -2,6 +2,6 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/add_to_favorites" android:title="@string/menu_add_to_favorites"
-          android:icon="@android:drawable/ic_menu_add" app:showAsAction="always"
+          android:icon="@drawable/ic_add" app:showAsAction="always"
           android:alphabeticShortcut="a" android:numericShortcut="0" />
 </menu>
