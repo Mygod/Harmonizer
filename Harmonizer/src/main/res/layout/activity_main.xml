@@ -4,7 +4,7 @@
               android:layout_width="match_parent" android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
                                        android:layout_height="?attr/actionBarSize" android:layout_width="match_parent"
-                                       android:background="?attr/colorPrimary"
+                                       android:background="?attr/colorPrimary" android:elevation="8dp"
                                        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
     <android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
                                             android:layout_width="match_parent" android:layout_height="match_parent">
@@ -30,7 +30,9 @@
                 </RelativeLayout>
             </LinearLayout>
         </ScrollView>
-        <RelativeLayout android:layout_width="240dp" android:layout_height="match_parent"
+        <RelativeLayout android:layout_width="240dp" android:layout_height="match_parent" android:elevation="4dp"
+
+
                         android:layout_gravity="start" android:background="#eee" android:clickable="true">
             <android.support.v7.widget.RecyclerView android:id="@+id/favorite" android:layout_width="match_parent"
                                                     android:layout_height="match_parent" />

@@ -207,7 +207,6 @@ public class MainActivity extends ActionBarActivity {
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (drawerLayout != null) {
-            drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
             drawerLayout.setDrawerListener(drawerToggle = new ActionBarDrawerToggle
                     (this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
                 @Override
