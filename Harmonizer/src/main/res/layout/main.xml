@@ -16,6 +16,7 @@
                           android:layout_below="@id/frequency_text" android:minHeight="20sp"
                           android:layout_width="match_parent" android:layout_height="match_parent">
                 <Button android:id="@+id/beep_button" android:text="@string/beep"
+                        android:textColor="@color/colorButtonText"
                         android:layout_width="match_parent" android:layout_height="match_parent" />
             </LinearLayout>
         </RelativeLayout>

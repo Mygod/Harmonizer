@@ -20,8 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.util.ArrayList;
 
@@ -212,14 +211,14 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onDrawerClosed(View view) {
                     super.onDrawerClosed(view);
-                    toolbar.setTitle(R.string.app_name);
+                    toolbar.setTitle(getText(R.string.app_name));
                     addFavoriteMenu.setVisible(false);
                 }
 
                 @Override
                 public void onDrawerOpened(View view) {
                     super.onDrawerOpened(view);
-                    toolbar.setTitle(R.string.favorites);
+                    toolbar.setTitle(getText(R.string.favorites));
                     addFavoriteMenu.setVisible(true);
                     hideInput(frequencyText);
                 }

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="material_blue_300">#91a7ff</color>
-    <color name="material_blue_500">#5677fc</color>
-    <color name="material_blue_700">#455ede</color>
-    <color name="colorButtonText">#000</color>
+    <color name="colorButtonText">#fff</color>
     <style name="Theme.Material.Blue" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
         <item name="colorAccent">@color/material_blue_300</item>
+        <item name="android:colorButtonNormal">@color/material_blue_500</item>
     </style>
 </resources>
