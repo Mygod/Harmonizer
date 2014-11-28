@@ -227,6 +227,12 @@ public class MainActivity extends ActionBarActivity {
         RecyclerView favoriteList = (RecyclerView) findViewById(R.id.favorite);
         favoriteList.setLayoutManager(new LinearLayoutManager(this));
         favoriteList.setItemAnimator(new DefaultItemAnimator());
+        favoriteList.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
         favoriteList.setAdapter(favoritesAdapter = new FavoritesAdapter());
         findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
