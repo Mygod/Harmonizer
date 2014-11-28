@@ -21,6 +21,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
+import tk.mygod.widget.RecyclerItemClickListener;
+import tk.mygod.widget.SwipeDismissRecyclerViewTouchListener;
 
 import java.util.ArrayList;
 
@@ -42,31 +44,23 @@ public class MainActivity extends ActionBarActivity {
             return String.format("%s (%s Hz)", Name, betterToString(Frequency));
         }
     }
-    private class FavoriteItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class FavoriteItemViewHolder extends RecyclerView.ViewHolder {
         private View view;
         private TextView text;
-        private FavoriteItem item;
 
         public FavoriteItemViewHolder(View itemView) {
             super(itemView);
             text = (TextView) itemView.findViewById(android.R.id.text1);
-            itemView.setOnClickListener(this);
             registerForContextMenu(view = itemView);
         }
 
         public void bind(FavoriteItem item) {
-            text.setText((this.item = item).getFullName());
+            text.setText(item.getFullName());
             view.setTag(item);
-        }
-
-        @Override
-        public void onClick(View v) {
-            frequencyText.setText(betterToString(item.Frequency));
-            if (drawerLayout != null) drawerLayout.closeDrawers();
         }
     }
     private class FavoritesAdapter extends RecyclerView.Adapter<FavoriteItemViewHolder> {
-        private ArrayList<FavoriteItem> favorites;
+        ArrayList<FavoriteItem> favorites;
         private SharedPreferences pref;
         private View empty;
 
@@ -104,12 +98,15 @@ public class MainActivity extends ActionBarActivity {
             notifyItemInserted(pos);
         }
 
-        public void remove(FavoriteItem item) {
-            int pos = favorites.indexOf(item);
+        public void removeAt(int pos) {
             favorites.remove(pos);
             update();
             notifyItemRemoved(pos);
             if (favorites.size() == 0) empty.setVisibility(View.VISIBLE);
+        }
+
+        public void remove(FavoriteItem item) {
+            removeAt(favorites.indexOf(item));
         }
 
         public void update() {
@@ -227,12 +224,27 @@ public class MainActivity extends ActionBarActivity {
         RecyclerView favoriteList = (RecyclerView) findViewById(R.id.favorite);
         favoriteList.setLayoutManager(new LinearLayoutManager(this));
         favoriteList.setItemAnimator(new DefaultItemAnimator());
-        favoriteList.setOnTouchListener(new View.OnTouchListener() {
+        SwipeDismissRecyclerViewTouchListener listener = new SwipeDismissRecyclerViewTouchListener(favoriteList,
+                new SwipeDismissRecyclerViewTouchListener.DismissCallbacks() {
+                    @Override
+                    public boolean canDismiss(int position) {
+                        return true;
+                    }
+
+                    @Override
+                    public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                        for (int position : reverseSortedPositions) favoritesAdapter.removeAt(position);
+                    }
+                });
+        favoriteList.setOnTouchListener(listener);
+        favoriteList.setOnScrollListener(listener.makeScrollListener());
+        favoriteList.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return false;
+            public void onItemClick(View view, int position) {
+                frequencyText.setText(betterToString(favoritesAdapter.favorites.get(position).Frequency));
+                if (drawerLayout != null) drawerLayout.closeDrawers();
             }
-        });
+        }));
         favoriteList.setAdapter(favoritesAdapter = new FavoritesAdapter());
         findViewById(R.id.beep_button).setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View view, MotionEvent motionevent) {
@@ -307,8 +319,11 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        getMenuInflater().inflate(R.menu.favorite_context_menu, menu);
         selectedItem = (FavoriteItem) v.getTag();
+        startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content),
+                        selectedItem.getFullName())), getString(R.string.share_title)));
+        //getMenuInflater().inflate(R.menu.favorite_context_menu, menu);
     }
 
     @Override
