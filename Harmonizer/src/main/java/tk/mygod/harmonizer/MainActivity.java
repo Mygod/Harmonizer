@@ -71,7 +71,7 @@ public class MainActivity extends ActionBarActivity {
         private View empty;
 
         public FavoritesAdapter() {
-            favorites = new ArrayList<FavoriteItem>();
+            favorites = new ArrayList<>();
             empty = findViewById(android.R.id.empty);
             int size = (pref = getSharedPreferences("favorites", MODE_PRIVATE)).getInt("size", 0);
             if (size == 0) return;
@@ -157,7 +157,7 @@ public class MainActivity extends ActionBarActivity {
         short last = 0;
         if (max < 16) max = 16;
         if (max > 2880000) max = 2880000;
-        ArrayList<Short> arrayList = new ArrayList<Short>(max);
+        ArrayList<Short> arrayList = new ArrayList<>(max);
         double k = 3.14159265358979323846264338327950288 / 24000 * frequency;
         while (i < max) arrayList.add((short) Math.round(32767 * Math.cos(k * i++)));
         while (i < 524288 && last < 32767) arrayList.add(last = (short) Math.round(32767 * Math.cos(k * i++))); // 1M
