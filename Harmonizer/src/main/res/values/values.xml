@@ -8,5 +8,7 @@
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
         <item name="colorAccent">@color/material_blue_300</item>
+        <item name="android:colorButtonNormal">@color/material_blue_500</item>
+        <item name="android:navigationBarColor">@color/material_blue_700</item>
     </style>
 </resources>
