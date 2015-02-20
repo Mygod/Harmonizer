@@ -1,5 +1,6 @@
 package tk.mygod.harmonizer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +13,6 @@ import android.media.AudioTrack;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,11 +20,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
     private static String betterToString(double value) {
         return value == Math.floor(value) ? String.format("%.0f", value) : Double.toString(value);
     }
@@ -204,7 +205,11 @@ public class MainActivity extends ActionBarActivity {
         frequencyText = (EditText) findViewById(R.id.frequency_text);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.favorites);
+        addFavoriteMenu = toolbar.getMenu().findItem(R.id.add_to_favorites);
+        boolean opened = drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START);
+        addFavoriteMenu.setVisible(opened);
+        toolbar.setTitle(getText(opened ? R.string.favorites : R.string.app_name));
         if (drawerLayout != null) {
             drawerLayout.setDrawerListener(drawerToggle = new ActionBarDrawerToggle
                     (this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
@@ -274,15 +279,6 @@ public class MainActivity extends ActionBarActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (drawerToggle != null) drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.favorites, menu);
-        (addFavoriteMenu = menu.findItem(R.id.add_to_favorites))
-                .setVisible(drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START));
-        return true;
     }
 
     @Override
