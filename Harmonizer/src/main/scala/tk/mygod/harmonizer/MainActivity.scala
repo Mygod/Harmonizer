@@ -1,13 +1,13 @@
 package tk.mygod.harmonizer
 
-import android.app.AlertDialog
+import android.app.{Activity, AlertDialog}
 import android.content.res.Configuration
 import android.content.{Context, DialogInterface, Intent}
 import android.media.{AudioFormat, AudioManager, AudioTrack}
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.{ActionBarActivity, ActionBarDrawerToggle}
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, RecyclerView, Toolbar}
 import android.view.View.OnTouchListener
 import android.view._
@@ -15,9 +15,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.{EditText, TextView}
 
 import scala.collection.mutable
-import scala.util.control.Breaks.{break, breakable}
 
-class MainActivity extends ActionBarActivity {
+class MainActivity extends Activity {
   private def generateTrack(frequency: Double): AudioTrack = {
     var max = if (frequency <= 0) 2 else (48000 / frequency).toInt
     if (max < 16) max = 16
@@ -59,12 +58,13 @@ class MainActivity extends ActionBarActivity {
     private val empty = findViewById(android.R.id.empty)
     private val pref = getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
-    breakable {
+    {
       val size = pref.getInt("size", 0)
-      if (size <= 0) break
-      empty.setVisibility(View.GONE)
-      for (i <- 0 until size) favorites += new FavoriteItem(pref.getString(i + "_name", ""),
-        java.lang.Double.longBitsToDouble(pref.getLong(i + "_freq", 0)))
+      if (size > 0) {
+        empty.setVisibility(View.GONE)
+        for (i <- 0 until size) favorites += new FavoriteItem(pref.getString(i + "_name", ""),
+          java.lang.Double.longBitsToDouble(pref.getLong(i + "_freq", 0)))
+      }
     }
 
     override def onCreateViewHolder(vg: ViewGroup, i: Int): FavoriteItemViewHolder = new FavoriteItemViewHolder(
@@ -154,7 +154,11 @@ class MainActivity extends ActionBarActivity {
     super.onCreate(bundle)
     setContentView(R.layout.activity_main)
     val toolbar = findViewById(R.id.toolbar).asInstanceOf[Toolbar]
-    setSupportActionBar(toolbar)
+    toolbar.inflateMenu(R.menu.favorites)
+    addFavoriteMenu = toolbar.getMenu.findItem(R.id.add_to_favorites)
+    val opened = drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START)
+    addFavoriteMenu.setVisible(opened)
+    toolbar.setTitle(if (opened) R.string.favorites else R.string.app_name)
     if (drawerLayout != null) {
       drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                                                R.string.drawer_open, R.string.drawer_close) {
@@ -171,12 +175,14 @@ class MainActivity extends ActionBarActivity {
           hideInput(frequencyText)
         }
       }
-      drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
       drawerLayout.setDrawerListener(drawerToggle)
     }
     val favoriteList = findViewById(R.id.favorite).asInstanceOf[RecyclerView]
     favoriteList.setLayoutManager(new LinearLayoutManager(this))
     favoriteList.setItemAnimator(new DefaultItemAnimator)
+    favoriteList.setOnTouchListener(new OnTouchListener {
+      override def onTouch(v: View, event: MotionEvent): Boolean = false
+    })
     favoriteList.setAdapter(favoritesAdapter)
     findViewById(R.id.beep_button).setOnTouchListener(new OnTouchListener {
       override def onTouch(v: View, event: MotionEvent): Boolean = {
@@ -214,14 +220,6 @@ class MainActivity extends ActionBarActivity {
   override def onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     if (drawerToggle != null) drawerToggle.onConfigurationChanged(newConfig)
-  }
-
-  override def onCreateOptionsMenu(menu: Menu): Boolean = {
-    super.onCreateOptionsMenu(menu)
-    getMenuInflater.inflate(R.menu.favorites, menu)
-    addFavoriteMenu = menu.findItem(R.id.add_to_favorites)
-    addFavoriteMenu.setVisible(drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START))
-    true
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
