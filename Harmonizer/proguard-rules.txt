@@ -16,3 +16,4 @@
 #   public *;
 #}
 -keepnames class ** { *; }
+-ignorewarnings

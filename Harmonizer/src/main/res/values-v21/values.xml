@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorButtonText">#fff</color>
+    <style name="Theme.Material.Blue" parent="Theme.Material.BlueBase">
+        <item name="android:alertDialogTheme">@style/Theme.Material.Blue.AlertDialog</item>
+    </style>
+    <style name="Theme.Material.Blue.AlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorPrimary">@color/material_blue_500</item>
+        <item name="android:colorPrimaryDark">@color/material_blue_700</item>
+        <item name="android:colorAccent">@color/material_blue_300</item>
+    </style>
 </resources>
