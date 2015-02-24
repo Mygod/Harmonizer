@@ -8,15 +8,16 @@ import android.os.Bundle
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.widget.Toolbar.OnMenuItemClickListener
 import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, RecyclerView, Toolbar}
 import android.view.View.OnTouchListener
 import android.view._
 import android.view.inputmethod.InputMethodManager
 import android.widget.{EditText, TextView}
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
-class MainActivity extends Activity {
+final class MainActivity extends Activity with OnMenuItemClickListener {
   private def generateTrack(frequency: Double): AudioTrack = {
     var max = if (frequency <= 0) 2 else (48000 / frequency).toInt
     if (max < 16) max = 16
@@ -54,7 +55,7 @@ class MainActivity extends Activity {
   }
 
   private class FavoritesAdapter extends RecyclerView.Adapter[FavoriteItemViewHolder] {
-    private val favorites = new mutable.ArrayBuffer[FavoriteItem]
+    private val favorites = new ArrayBuffer[FavoriteItem]
     private val empty = findViewById(android.R.id.empty)
     private val pref = getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
@@ -158,6 +159,7 @@ class MainActivity extends Activity {
     addFavoriteMenu = toolbar.getMenu.findItem(R.id.add_to_favorites)
     val opened = drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START)
     addFavoriteMenu.setVisible(opened)
+    toolbar.setOnMenuItemClickListener(this)
     toolbar.setTitle(if (opened) R.string.favorites else R.string.app_name)
     if (drawerLayout != null) {
       drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -222,22 +224,24 @@ class MainActivity extends Activity {
     if (drawerToggle != null) drawerToggle.onConfigurationChanged(newConfig)
   }
 
-  override def onOptionsItemSelected(item: MenuItem): Boolean = {
-    if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) return true
-    if (item.getItemId != R.id.add_to_favorites) return super.onOptionsItemSelected(item)
+  override def onMenuItemClick(menuItem: MenuItem): Boolean = {
+    if (menuItem.getItemId != R.id.add_to_favorites) return super.onOptionsItemSelected(menuItem)
     val text: EditText = new EditText(this)
     new AlertDialog.Builder(this).setTitle(R.string.add_favorite_dialog_title).setView(text)
       .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener {
-        def onClick(dialog: DialogInterface, which: Int) {
-          favoritesAdapter.add(new FavoriteItem(text.getText.toString, getFrequency))
-          hideInput(text)
-        }
-      }).setNegativeButton(android.R.string.cancel, null).show
+      def onClick(dialog: DialogInterface, which: Int) {
+        favoritesAdapter.add(new FavoriteItem(text.getText.toString, getFrequency))
+        hideInput(text)
+      }
+    }).setNegativeButton(android.R.string.cancel, null).show
     text.requestFocus
     getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
-                                                  .toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+      .toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     true
   }
+
+  override def onOptionsItemSelected(item: MenuItem): Boolean =
+    drawerToggle != null && drawerToggle.onOptionsItemSelected(item)
 
   override def onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo)
