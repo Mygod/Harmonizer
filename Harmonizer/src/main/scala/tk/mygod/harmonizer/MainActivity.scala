@@ -18,20 +18,37 @@ import android.widget.{EditText, TextView}
 import scala.collection.mutable.ArrayBuffer
 
 final class MainActivity extends Activity with OnMenuItemClickListener {
+  var buffer: ArrayBuffer[Short] = null // recycling ArrayBuffer ;-)
+
   private def generateTrack(frequency: Double): AudioTrack = {
     var max = if (frequency <= 0) 2 else (48000 / frequency).toInt
-    if (max < 16) max = 16
-    if (max > 2880000) max = 2880000
+    if (max < 16) max = 16 else if (max > 2880000) max = 2880000
+    if (buffer == null) buffer = new ArrayBuffer[Short](max) else buffer.sizeHint(max)
     val k = 3.14159265358979323846264338327950288 / 24000 * frequency
-    val cache = 0.until(2880000).map(i => (i, (32767 * Math.cos(k * i)).round.toShort))
-                 .takeWhile { case (i, v) => i < max || v < 32760 || i < 524288 && v < 32767 }
-                 .map { case (i, v) => v }.toArray
-    val (left, right) = cache.splitAt(cache.length * 3 / 4)
-    val samples = right ++ left
+    var i = 0
+    var last: Short = 32767
+    while (i < max || i < 524288 && last < 32767 || i < 2880000 && last < 32760) {  // 1M, NO MORE THAN 60s
+      last = (32767 * Math.cos(k * i)).round.toShort
+      buffer.append(last)
+      i += 1
+    }
+    i -= 1
+    val delta = i * 3 / 4
+    val samples = new Array[Short](i)
+    var s = 0
+    for (j <- delta until i) {
+      samples(s) = buffer(j)
+      s += 1
+    }
+    for (j <- 0 until delta) {
+      samples(s) = buffer(j)
+      s += 1
+    }
+    buffer.clear
     val track = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
-                               AudioFormat.ENCODING_PCM_16BIT, samples.length << 1, AudioTrack.MODE_STATIC)
-    track.write(samples, 0, samples.length)
-    track.setLoopPoints(0, samples.length, -1)
+                               AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
+    track.write(samples, 0, i)
+    track.setLoopPoints(0, i, -1)
     track
   }
 
