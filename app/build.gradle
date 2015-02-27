@@ -32,9 +32,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:recyclerview-v7:21.0.2'
-    compile 'org.scala-lang:scala-library:2.11.5'
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':mygod-lib-android')
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:recyclerview-v7:21.0.2'
 }
