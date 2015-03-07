@@ -13,7 +13,7 @@ import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, Recy
 import android.view.View.OnTouchListener
 import android.view._
 import android.view.inputmethod.InputMethodManager
-import android.widget.{NumberPicker, EditText, TextView}
+import android.widget.{EditText, NumberPicker, TextView}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -138,11 +138,9 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
   muteTrack.write(new Array[Short](16), 0, 16)
   muteTrack.setLoopPoints(0, 16, -1)
   private lazy val frequencyText = findViewById(R.id.frequency_text).asInstanceOf[EditText]
-  private var samplingRatePicker: NumberPicker = _
   private lazy val favoritesAdapter = new FavoritesAdapter
   private lazy val drawerLayout = findViewById(R.id.drawer_layout).asInstanceOf[DrawerLayout]
   private var drawerToggle: ActionBarDrawerToggle = null
-  private var addFavoriteMenu: MenuItem = null
   private var selectedItem: FavoriteItem = null
   private var pressed = false
 
@@ -177,7 +175,7 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
     setContentView(R.layout.activity_main)
     val toolbar = findViewById(R.id.toolbar).asInstanceOf[Toolbar]
     toolbar.inflateMenu(R.menu.favorites)
-    addFavoriteMenu = toolbar.getMenu.findItem(R.id.add_to_favorites)
+    val addFavoriteMenu = toolbar.getMenu.findItem(R.id.add_to_favorites)
     val opened = drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START)
     addFavoriteMenu.setVisible(opened)
     toolbar.setOnMenuItemClickListener(this)
@@ -207,7 +205,7 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
       override def onTouch(v: View, event: MotionEvent): Boolean = false
     })
     favoriteList.setAdapter(favoritesAdapter)
-    samplingRatePicker = findViewById(R.id.sampling_rate_picker).asInstanceOf[NumberPicker]
+    val samplingRatePicker = findViewById(R.id.sampling_rate_picker).asInstanceOf[NumberPicker]
     try {
       val minField = classOf[AudioTrack].getDeclaredField("SAMPLE_RATE_HZ_MIN")
       minField.setAccessible(true)
@@ -226,8 +224,10 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
         samplingRatePicker.setMaxValue(48000)
         samplingRatePicker.setValue(48000)
     }
-    findViewById(R.id.beep_button).setOnTouchListener(new OnTouchListener {
+    val button = findViewById(R.id.beep_button)
+    button.setOnTouchListener(new OnTouchListener {
       override def onTouch(v: View, event: MotionEvent): Boolean = {
+        findViewById(R.id.scroller).asInstanceOf[ViewGroup].requestDisallowInterceptTouchEvent(true)
         event.getAction match {
           case MotionEvent.ACTION_DOWN =>
             pressed = true
