@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:fillViewport="true"
             android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent">
-        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_margin="20dp">
-            <TextView android:id="@+id/welcoming_text" android:text="@string/welcoming_message"
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:orientation="vertical" android:padding="20dp">
+        <TextView android:id="@+id/welcoming_text" android:text="@string/welcoming_message"
+                  android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <Space android:layout_width="match_parent" android:layout_height="10dp" />
+        <NumberPicker android:id="@+id/sampling_rate_picker"
                       android:layout_width="match_parent" android:layout_height="wrap_content" />
-            <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
-                      android:layout_height="wrap_content" android:layout_marginTop="16dip"
-                      android:ems="10" android:layout_below="@id/welcoming_text"
-                      android:inputType="numberDecimal|numberSigned" android:hint="@string/frequency_hint"
-                      android:layout_alignParentStart="true" android:layout_alignEnd="@id/welcoming_text"
-                      android:layout_alignParentLeft="true" android:layout_alignRight="@id/welcoming_text" />
-            <LinearLayout android:layout_marginTop="16dip"
-                          android:layout_below="@id/frequency_text" android:minHeight="20sp"
-                          android:layout_width="match_parent" android:layout_height="match_parent">
-                <Button android:id="@+id/beep_button" android:text="@string/beep"
-                        android:textColor="@color/colorButtonText"
-                        android:layout_width="match_parent" android:layout_height="match_parent" />
-            </LinearLayout>
-        </RelativeLayout>
+        <Space android:layout_width="match_parent" android:layout_height="10dp" />
+        <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="numberDecimal|numberSigned" android:hint="@string/frequency_hint" />
+        <Button android:id="@+id/beep_button" android:text="@string/beep"
+                android:textColor="@color/colorButtonText" android:minHeight="20sp" android:layout_weight="1"
+                android:layout_width="match_parent" android:layout_height="0dp" />
     </LinearLayout>
 </ScrollView>
