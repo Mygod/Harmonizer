@@ -5,15 +5,13 @@
                   android:orientation="vertical" android:padding="20dp">
         <TextView android:id="@+id/welcoming_text" android:text="@string/welcoming_message"
                   android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Space android:layout_width="match_parent" android:layout_height="10dp" />
         <NumberPicker android:id="@+id/sampling_rate_picker"
                       android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Space android:layout_width="match_parent" android:layout_height="10dp" />
         <EditText android:id="@+id/frequency_text" android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:inputType="numberDecimal|numberSigned" android:hint="@string/frequency_hint" />
-        <Button android:id="@+id/beep_button" android:text="@string/beep"
-                android:textColor="@color/colorButtonText" android:minHeight="20sp" android:layout_weight="1"
-                android:layout_width="match_parent" android:layout_height="0dp" />
+        <Button android:id="@+id/beep_button" android:text="@string/beep" android:layout_weight="1"
+                android:textColor="@color/colorButtonText" android:minHeight="40sp" android:textSize="30sp"
+                android:layout_width="match_parent" android:layout_height="0dp" android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>
