@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="settings_audio_bit_depth" translatable="false">
+        <item>@string/settings_audio_bit_depth_8</item>
+        <item>@string/settings_audio_bit_depth_16</item>
+        <item>@string/settings_audio_bit_depth_float</item>
+    </string-array>
+</resources>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/settings" android:title="@string/settings" android:icon="@drawable/ic_action_settings"
+          app:showAsAction="always" android:alphabeticShortcut="s" android:numericShortcut="0"/>
     <item android:id="@+id/add_to_favorites" android:title="@string/menu_add_to_favorites"
-          android:icon="@drawable/ic_add" app:showAsAction="always"
-          android:alphabeticShortcut="a" android:numericShortcut="0" />
+          android:icon="@drawable/ic_content_add" app:showAsAction="always"
+          android:alphabeticShortcut="a" android:numericShortcut="1" />
 </menu>

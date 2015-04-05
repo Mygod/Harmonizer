@@ -24,8 +24,16 @@ android {
         versionName "2.1.9.328"
     }
     buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt',
+                    'proguard-rules.debug.txt'
+            debuggable true
+        }
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }

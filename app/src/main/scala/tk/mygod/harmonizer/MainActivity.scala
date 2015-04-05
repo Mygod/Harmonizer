@@ -1,6 +1,6 @@
 package tk.mygod.harmonizer
 
-import android.app.{Activity, AlertDialog}
+import android.app.AlertDialog
 import android.content.res.Configuration
 import android.content.{Context, DialogInterface, Intent}
 import android.media.{AudioFormat, AudioManager, AudioTrack}
@@ -13,45 +13,86 @@ import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, Recy
 import android.view.View.OnTouchListener
 import android.view._
 import android.view.inputmethod.InputMethodManager
-import android.widget.{EditText, NumberPicker, TextView}
+import android.widget.{EditText, TextView}
+import tk.mygod.app.ActivityPlus
 
 import scala.collection.mutable.ArrayBuffer
 
-final class MainActivity extends Activity with OnMenuItemClickListener {
-  var buffer: ArrayBuffer[Short] = null // recycling ArrayBuffer ;-)
-
-  private def generateTrack(frequency: Double, samplingRate: Int): AudioTrack = {
-    val s10 = samplingRate * 10
-    val minute = samplingRate * 60
-    var max = if (frequency <= 0) 2 else (samplingRate / frequency).toInt
-    if (max < 16) max = 16 else if (max > minute) max = minute
-    if (buffer == null) buffer = new ArrayBuffer[Short](max) else buffer.sizeHint(max)
-    val k = 3.14159265358979323846264338327950288 * 2 * frequency / samplingRate
-    var i = 0
-    var last: Short = 32767
-    while (i < max || i < 524288 && last < 32767 || i < s10 && last < 32760) {
-      last = (32767 * Math.cos(k * i)).round.toShort
-      buffer.append(last)
-      i += 1
-    }
-    i -= 1
+final class MainActivity extends ActivityPlus with OnMenuItemClickListener {
+  lazy val audioConfig = new AudioConfig(this)
+  // recycling ArrayBuffer ;-)
+  var byteBuffer: ArrayBuffer[Byte] = _
+  var shortBuffer: ArrayBuffer[Short] = _
+  var floatBuffer: ArrayBuffer[Float] = _
+  private def shift[T: Manifest](buffer: ArrayBuffer[T], i: Int) = {
     val delta = i * 3 / 4
-    val samples = new Array[Short](i)
+    val result = new Array[T](i)
     var s = 0
     for (j <- delta until i) {
-      samples(s) = buffer(j)
+      result(s) = buffer(j)
       s += 1
     }
     for (j <- 0 until delta) {
-      samples(s) = buffer(j)
+      result(s) = buffer(j)
       s += 1
     }
-    buffer.clear
-    val track = new AudioTrack(AudioManager.STREAM_MUSIC, samplingRate, AudioFormat.CHANNEL_OUT_MONO,
-                               AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
-    track.write(samples, 0, i)
-    track.setLoopPoints(0, i, -1)
-    track
+    result
+  }
+  private def generateTrack(frequency: Double) = {
+    val s10 = audioConfig.samplingRate * 10
+    val minute = audioConfig.samplingRate * 60
+    var max = if (frequency <= 0) 2 else (audioConfig.samplingRate / frequency).toInt
+    if (max < 16) max = 16 else if (max > minute) max = minute
+    val k = 3.14159265358979323846264338327950288 * 2 * frequency / audioConfig.samplingRate
+    var i = 0
+    audioConfig.format match {
+      case AudioFormat.ENCODING_PCM_8BIT =>
+        if (byteBuffer == null) byteBuffer = new ArrayBuffer[Byte](max) else byteBuffer.sizeHint(max)
+        var last: Byte = -1
+        while (i < max || last != -1 && (i < 524288 || i < s10 && last != -2)) {
+          last = (127 * Math.cos(k * i) + 128).round.toByte
+          byteBuffer.append(last)
+          i += 1
+        }
+        i -= 1
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+          AudioFormat.ENCODING_PCM_8BIT, i, AudioTrack.MODE_STATIC)
+        track.write(shift(byteBuffer, i), 0, i)
+        byteBuffer.clear
+        track.setLoopPoints(0, i, -1)
+        track
+      case AudioFormat.ENCODING_PCM_16BIT =>
+        if (shortBuffer == null) shortBuffer = new ArrayBuffer[Short](max) else shortBuffer.sizeHint(max)
+        var last: Short = 32767
+        while (i < max || i < 524288 && last < 32767 || i < s10 && last < 32727) {
+          last = (32767 * Math.cos(k * i)).round.toShort
+          shortBuffer.append(last)
+          i += 1
+        }
+        i -= 1
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+          AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
+        track.write(shift(shortBuffer, i), 0, i)
+        shortBuffer.clear
+        track.setLoopPoints(0, i, -1)
+        track
+      case AudioFormat.ENCODING_PCM_FLOAT =>
+        if (floatBuffer == null) floatBuffer = new ArrayBuffer[Float](max) else floatBuffer.sizeHint(max)
+        var last: Float = 1
+        while (i < max || i < 524288 && last < 1 || i < s10 && last < 0.9999) {
+          last = Math.cos(k * i).toFloat
+          floatBuffer.append(last)
+          i += 1
+        }
+        i -= 1
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+          AudioFormat.ENCODING_PCM_FLOAT, i << 2, AudioTrack.MODE_STATIC)
+        track.write(shift(floatBuffer, i), 0, i, AudioTrack.WRITE_BLOCKING)
+        floatBuffer.clear
+        track.setLoopPoints(0, i, -1)
+        track
+      case _ => throw new IllegalArgumentException
+    }
   }
 
   private class FavoriteItemViewHolder(private val view: View) extends RecyclerView.ViewHolder(view)
@@ -87,7 +128,7 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
       }
     }
 
-    override def onCreateViewHolder(vg: ViewGroup, i: Int): FavoriteItemViewHolder = new FavoriteItemViewHolder(
+    override def onCreateViewHolder(vg: ViewGroup, i: Int) = new FavoriteItemViewHolder(
       LayoutInflater.from(vg.getContext).inflate(android.R.layout.simple_list_item_1, vg, false))
 
     override def onBindViewHolder(vh: FavoriteItemViewHolder, i: Int) {
@@ -131,8 +172,7 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
   }
 
   private var savedFrequency = .0
-  private var savedSamplingRate = 0
-  private var savedTrack: AudioTrack = null
+  private var savedTrack: AudioTrack = _
   private val muteTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
                                          AudioFormat.ENCODING_PCM_16BIT, 32, AudioTrack.MODE_STATIC)
   muteTrack.write(new Array[Short](16), 0, 16)
@@ -140,8 +180,8 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
   private lazy val frequencyText = findViewById(R.id.frequency_text).asInstanceOf[EditText]
   private lazy val favoritesAdapter = new FavoritesAdapter
   private lazy val drawerLayout = findViewById(R.id.drawer_layout).asInstanceOf[DrawerLayout]
-  private var drawerToggle: ActionBarDrawerToggle = null
-  private var selectedItem: FavoriteItem = null
+  private var drawerToggle: ActionBarDrawerToggle = _
+  private var selectedItem: FavoriteItem = _
   private var pressed = false
 
   private def hideInput(text: TextView) {
@@ -175,8 +215,11 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
     setContentView(R.layout.activity_main)
     val toolbar = findViewById(R.id.toolbar).asInstanceOf[Toolbar]
     toolbar.inflateMenu(R.menu.favorites)
-    val addFavoriteMenu = toolbar.getMenu.findItem(R.id.add_to_favorites)
+    val menu = toolbar.getMenu
+    val settingsMenu = menu.findItem(R.id.settings)
+    val addFavoriteMenu = menu.findItem(R.id.add_to_favorites)
     val opened = drawerLayout == null || drawerLayout.isDrawerOpen(GravityCompat.START)
+    settingsMenu.setVisible(!opened)
     addFavoriteMenu.setVisible(opened)
     toolbar.setOnMenuItemClickListener(this)
     toolbar.setTitle(if (opened) R.string.favorites else R.string.app_name)
@@ -186,12 +229,14 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
         override def onDrawerClosed(view: View) {
           super.onDrawerClosed(view)
           toolbar.setTitle(R.string.app_name)
+          settingsMenu.setVisible(true)
           addFavoriteMenu.setVisible(false)
         }
 
         override def onDrawerOpened(view: View) {
           super.onDrawerOpened(view)
           toolbar.setTitle(R.string.favorites)
+          settingsMenu.setVisible(false)
           addFavoriteMenu.setVisible(true)
           hideInput(frequencyText)
         }
@@ -205,25 +250,6 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
       override def onTouch(v: View, event: MotionEvent): Boolean = false
     })
     favoriteList.setAdapter(favoritesAdapter)
-    val samplingRatePicker = findViewById(R.id.sampling_rate_picker).asInstanceOf[NumberPicker]
-    try {
-      val minField = classOf[AudioTrack].getDeclaredField("SAMPLE_RATE_HZ_MIN")
-      minField.setAccessible(true)
-      samplingRatePicker.setMinValue(minField.get(null).asInstanceOf[Int])
-    } catch {
-      case exc: NoSuchFieldException => samplingRatePicker.setMinValue(4000)
-    }
-    try {
-      val maxField = classOf[AudioTrack].getDeclaredField("SAMPLE_RATE_HZ_MAX")
-      maxField.setAccessible(true)
-      val max = maxField.get(null).asInstanceOf[Int]
-      samplingRatePicker.setMaxValue(max)
-      samplingRatePicker.setValue(max)
-    } catch {
-      case exc: NoSuchFieldException => // 48000 are used before this field is introduced
-        samplingRatePicker.setMaxValue(48000)
-        samplingRatePicker.setValue(48000)
-    }
     val button = findViewById(R.id.beep_button)
     button.setOnTouchListener(new OnTouchListener {
       override def onTouch(v: View, event: MotionEvent): Boolean = {
@@ -234,16 +260,14 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
             new Thread {
               override def run {
                 val frequency = getFrequency
-                val samplingRate = samplingRatePicker.getValue
-                if (savedFrequency != frequency || savedSamplingRate != samplingRate) {
+                if (audioConfig.changed || savedFrequency != frequency) {
                   savedFrequency = frequency
-                  savedSamplingRate = samplingRate
                   if (savedTrack != null) {
                     savedTrack.stop
                     savedTrack.release
                     savedTrack = null
                   }
-                  savedTrack = generateTrack(frequency, samplingRate)
+                  savedTrack = generateTrack(frequency)
                 }
                 if (savedTrack != null && pressed) savedTrack.play
               }
@@ -267,23 +291,28 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
   }
 
   override def onMenuItemClick(menuItem: MenuItem): Boolean = {
-    if (menuItem.getItemId != R.id.add_to_favorites) return super.onOptionsItemSelected(menuItem)
-    val text: EditText = new EditText(this)
-    new AlertDialog.Builder(this).setTitle(R.string.add_favorite_dialog_title).setView(text)
-      .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener {
-      def onClick(dialog: DialogInterface, which: Int) {
-        favoritesAdapter.add(new FavoriteItem(text.getText.toString, getFrequency))
-        hideInput(text)
-      }
-    }).setNegativeButton(android.R.string.cancel, null).show
-    text.requestFocus
-    getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
-      .toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    true
+    menuItem.getItemId match {
+      case R.id.settings =>
+        startActivity(intentActivity[SettingsActivity])
+        true
+      case R.id.add_to_favorites =>
+        val text: EditText = new EditText(this)
+        new AlertDialog.Builder(this).setTitle(R.string.add_favorite_dialog_title).setView(text)
+          .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener {
+          def onClick(dialog: DialogInterface, which: Int) {
+            favoritesAdapter.add(new FavoriteItem(text.getText.toString, getFrequency))
+            hideInput(text)
+          }
+        }).setNegativeButton(android.R.string.cancel, null).show
+        text.requestFocus
+        getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
+          .toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+        true
+      case _ => super.onOptionsItemSelected(menuItem)
+    }
   }
 
-  override def onOptionsItemSelected(item: MenuItem): Boolean =
-    drawerToggle != null && drawerToggle.onOptionsItemSelected(item)
+  override def onOptionsItemSelected(item: MenuItem) = drawerToggle != null && drawerToggle.onOptionsItemSelected(item)
 
   override def onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo)
@@ -291,7 +320,7 @@ final class MainActivity extends Activity with OnMenuItemClickListener {
     selectedItem = v.getTag.asInstanceOf[FavoriteItem]
   }
 
-  override def onContextItemSelected(item: MenuItem): Boolean = {
+  override def onContextItemSelected(item: MenuItem) = {
     item.getItemId match {
       case R.id.share =>
         startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
