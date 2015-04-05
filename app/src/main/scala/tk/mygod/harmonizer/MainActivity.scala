@@ -304,9 +304,6 @@ final class MainActivity extends ActivityPlus with OnMenuItemClickListener {
             hideInput(text)
           }
         }).setNegativeButton(android.R.string.cancel, null).show
-        text.requestFocus
-        getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
-          .toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
         true
       case _ => super.onOptionsItemSelected(menuItem)
     }
