@@ -15,8 +15,8 @@ final class SettingsHolderFragment extends PreferenceFragment with FragmentPlus 
     addPreferencesFromResource(R.xml.settings)
     val config = new AudioConfig(getActivity)
     val samplingRate = findPreference("audio.samplingRate").asInstanceOf[NumberPickerPreference]
-    samplingRate.setMax(AudioConfig.maxSamplingRate)
     samplingRate.setMin(AudioConfig.minSamplingRate)
+    samplingRate.setMax(AudioConfig.maxSamplingRate)
     samplingRate.setValue(config.getSamplingRate)
     findPreference("audio.bitDepth").asInstanceOf[DropDownPreference].setValue(config.getFormat.toString)
   }
