@@ -26,6 +26,12 @@ class FavoritesFragment extends CircularRevealFragment {
     itemView.setOnClickListener(this)
     registerForContextMenu(itemView)
 
+    {
+      val ta = getActivity.obtainStyledAttributes(Array(android.R.attr.selectableItemBackground))
+      itemView.setBackground(ta.getDrawable(0))
+      ta.recycle
+    }
+
     def bind(item: FavoriteItem) {
       this.item = item
       text.setText(item.getFullName)
