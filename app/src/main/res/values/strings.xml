@@ -7,10 +7,9 @@
     <string name="favorites">Favorites</string>
     <string name="drawer_open">Favorites opened.</string>
     <string name="drawer_close">Favorites closed.</string>
-    <string name="favorite_empty_hint">Press the add button to add the current frequency to your favorite list.
+    <string name="favorite_empty_hint">There aren\'t any favorites yet. Add a new one using the input box above.
         Long-press for more actions.</string>
-    <string name="menu_add_to_favorites">Add to Favorites</string>
-    <string name="add_favorite_dialog_title">Please enter the name:</string>
+    <string name="favorite_name_text_hint">Nickname for current frequency</string>
     <string name="favorite_context_menu_share">Share</string>
     <string name="favorite_context_menu_remove">Remove</string>
     <string name="share_title">Send to…</string>

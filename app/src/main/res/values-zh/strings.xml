@@ -7,7 +7,6 @@
     <string name="drawer_open">收藏夹已打开。</string>
     <string name="drawer_close">收藏夹已关闭。</string>
     <string name="favorite_empty_hint">点击添加按钮将当前频率添加到收藏夹。长按可执行更多操作。</string>
-    <string name="menu_add_to_favorites">添加到收藏夹</string>
     <string name="add_favorite_dialog_title">请输入名称：</string>
     <string name="favorite_context_menu_share">共享</string>
     <string name="favorite_context_menu_remove">删除</string>
