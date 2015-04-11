@@ -1,23 +1,16 @@
 package tk.mygod.harmonizer
 
 import android.os.Bundle
-import android.preference.PreferenceFragment
-import tk.mygod.app.FragmentPlus
-import tk.mygod.preference.{DropDownPreference, NumberPickerPreference}
+import android.view.{LayoutInflater, ViewGroup}
+import tk.mygod.app.CircularRevealFragment
 
 /**
  * @author Mygod
  */
-class SettingsFragment extends PreferenceFragment with FragmentPlus {
-  override def onCreate(savedInstanceState: Bundle) {
-    super.onCreate(savedInstanceState)
-    getPreferenceManager.setSharedPreferencesName("settings")
-    addPreferencesFromResource(R.xml.settings)
-    val config = new AudioConfig(getActivity)
-    val samplingRate = findPreference("audio.samplingRate").asInstanceOf[NumberPickerPreference]
-    samplingRate.setMax(AudioConfig.maxSamplingRate)
-    samplingRate.setMin(AudioConfig.minSamplingRate)
-    samplingRate.setValue(config.getSamplingRate)
-    findPreference("audio.bitDepth").asInstanceOf[DropDownPreference].setValue(config.getFormat.toString)
+final class SettingsFragment extends CircularRevealFragment {
+  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
+    val result = inflater.inflate(R.layout.fragment_settings, container, false)
+    configureToolbar(result, R.string.settings, 0)
+    result
   }
 }
