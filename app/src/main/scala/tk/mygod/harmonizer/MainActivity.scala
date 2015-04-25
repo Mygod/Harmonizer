@@ -1,8 +1,6 @@
 package tk.mygod.harmonizer
 
-import android.content.Context
 import android.os.Bundle
-import android.view.inputmethod.InputMethodManager
 import tk.mygod.app.FragmentStackActivity
 import tk.mygod.view.LocationObserver
 

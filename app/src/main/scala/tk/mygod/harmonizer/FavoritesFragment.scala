@@ -2,10 +2,10 @@ package tk.mygod.harmonizer
 
 import android.content.{Intent, Context}
 import android.os.Bundle
-import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, RecyclerView}
+import android.support.v7.widget.{AppCompatEditText, DefaultItemAnimator, LinearLayoutManager, RecyclerView}
 import android.view._
 import android.view.inputmethod.EditorInfo
-import android.widget.{EditText, TextView}
+import android.widget.TextView
 import tk.mygod.app.CircularRevealFragment
 import tk.mygod.util.MethodWrappers._
 import tk.mygod.view.LocationObserver
@@ -99,10 +99,10 @@ class FavoritesFragment extends CircularRevealFragment {
   private var favoritesAdapter: FavoritesAdapter = _
   private var selectedItem: FavoriteItem = _
 
-  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
+  override def onCreateSubView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
     val result = inflater.inflate(R.layout.fragment_favorites, container, false)
     configureToolbar(result, R.string.favorites, 0)
-    result.findViewById(R.id.favorite_name_text).asInstanceOf[EditText].setOnEditorActionListener(
+    result.findViewById(R.id.favorite_name_text).asInstanceOf[AppCompatEditText].setOnEditorActionListener(
       (v: TextView, actionId: Int, event: KeyEvent) => if (actionId == EditorInfo.IME_ACTION_SEND) {
         favoritesAdapter.add(new FavoriteItem(v.getText.toString, mainFragment.getFrequency))
         v.setText(null)
