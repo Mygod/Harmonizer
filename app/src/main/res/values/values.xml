@@ -3,8 +3,7 @@
     <color name="material_blue_300">#91a7ff</color>
     <color name="material_blue_500">#5677fc</color>
     <color name="material_blue_700">#455ede</color>
-    <color name="colorButtonText">#000</color>
-    <style name="Theme.Material.Blue" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.Material.BlueBase" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
         <item name="colorAccent">@color/material_blue_300</item>
@@ -12,6 +11,7 @@
         <item name="android:navigationBarColor">@color/material_blue_700</item>
         <item name="android:alertDialogTheme">@style/Theme.Material.Blue.AlertDialog</item>
     </style>
+    <style name="Theme.Material.Blue" parent="Theme.Material.BlueBase" />
     <style name="Theme.Material.Blue.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
