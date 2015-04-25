@@ -2,12 +2,11 @@ package tk.mygod.harmonizer
 
 import android.media.{AudioFormat, AudioManager, AudioTrack}
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
+import android.support.v7.widget.AppCompatEditText
 import android.support.v7.widget.Toolbar.OnMenuItemClickListener
 import android.view.View.OnTouchListener
 import android.view._
-import android.widget.{EditText, TextView}
-import tk.mygod.app.FragmentPlus
+import tk.mygod.app.ToolbarFragment
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
@@ -15,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * @author Mygod
  */
-class MainFragment extends FragmentPlus with OnMenuItemClickListener {
+class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
   lazy val audioConfig = new AudioConfig(getActivity)
   // recycling ArrayBuffer ;-)
   var byteBuffer: ArrayBuffer[Byte] = _
@@ -98,7 +97,7 @@ class MainFragment extends FragmentPlus with OnMenuItemClickListener {
     AudioFormat.ENCODING_PCM_16BIT, 32, AudioTrack.MODE_STATIC)
   muteTrack.write(new Array[Short](16), 0, 16)
   muteTrack.setLoopPoints(0, 16, -1)
-  var frequencyText: TextView = _
+  var frequencyText: AppCompatEditText = _
   private var pressed = false
 
   def getFrequency = try frequencyText.getText.toString.toDouble
@@ -124,11 +123,10 @@ class MainFragment extends FragmentPlus with OnMenuItemClickListener {
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
     val result = inflater.inflate(R.layout.fragment_main, container, false)
-    frequencyText = result.findViewById(R.id.frequency_text).asInstanceOf[EditText]
-    val toolbar = result.findViewById(R.id.toolbar).asInstanceOf[Toolbar]
+    frequencyText = result.findViewById(R.id.frequency_text).asInstanceOf[AppCompatEditText]
+    configureToolbar(result, R.string.app_name)
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener(this)
-    toolbar.setTitle(R.string.app_name)
     result.findViewById(R.id.settings).setOnTouchListener(LocationObserver)
     result.findViewById(R.id.favorites).setOnTouchListener(LocationObserver)
     val button = result.findViewById(R.id.beep_button)

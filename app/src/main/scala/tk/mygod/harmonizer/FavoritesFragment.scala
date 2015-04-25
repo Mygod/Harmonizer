@@ -118,8 +118,9 @@ class FavoritesFragment extends CircularRevealFragment {
 
   override def onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo)
-    getActivity.getMenuInflater.inflate(R.menu.context_menu_favorite, menu)
     selectedItem = v.getTag.asInstanceOf[FavoriteItem]
+    getActivity.getMenuInflater.inflate(R.menu.context_menu_favorite, menu)
+    menu.setHeaderTitle(selectedItem.getFullName)
   }
 
   override def onContextItemSelected(item: MenuItem) = {
