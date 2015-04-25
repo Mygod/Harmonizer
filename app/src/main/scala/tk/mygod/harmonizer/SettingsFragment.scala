@@ -13,4 +13,11 @@ final class SettingsFragment extends CircularRevealFragment {
     configureToolbar(result, R.string.settings, 0)
     result
   }
+
+  override def onDestroyView {
+    val manager = getFragmentManager
+    val fragment = manager.findFragmentById(android.R.id.content)
+    if (fragment != null) manager.beginTransaction.remove(fragment).commit
+    super.onDestroyView
+  }
 }
