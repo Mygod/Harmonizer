@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.3'
+        classpath 'com.android.tools.build:gradle:1.2.3'
         classpath "jp.leafytree.gradle:gradle-android-scala-plugin:1.4"
     }
 }
@@ -20,8 +20,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 328
-        versionName "2.2.9.328"
+        versionCode 340
+        versionName "2.2.10.340"
     }
     buildTypes {
         debug {
@@ -42,5 +42,5 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':mygod-lib-android')
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
 }
