@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
               android:layout_width="match_parent" android:layout_height="match_parent"
-              android:background="?android:attr/windowBackground">
+              android:background="?android:attr/windowBackground"
+              android:focusable="true" android:focusableInTouchMode="true">
     <include layout="@layout/toolbar_light_dark" />
-    <android.support.v7.widget.AppCompatEditText android:id="@+id/favorite_name_text"
-                                                 android:layout_width="match_parent" android:imeOptions="actionSend"
-                                                 android:layout_height="wrap_content" android:singleLine="true"
-                                                 android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
-                                                 android:hint="@string/favorite_name_text_hint" />
+    <tk.mygod.widget.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <android.support.v7.widget.AppCompatEditText android:id="@+id/favorite_name_text" android:singleLine="true"
+                                                     android:layout_width="match_parent" android:imeOptions="actionSend"
+                                                     android:layout_height="wrap_content"
+                                                     android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+                                                     android:hint="@string/favorite_name_text_hint"
+                                                     android:nextFocusUp="@id/favorite_name_text"
+                                                     android:nextFocusLeft="@id/favorite_name_text" />
+    </tk.mygod.widget.TextInputLayout>
     <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView android:id="@+id/favorite" android:layout_width="match_parent"
                                                 android:layout_height="match_parent" />

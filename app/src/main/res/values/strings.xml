@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">Harmonizer</string>
     <string name="welcoming_message">Welcome to Harmonizer! This is the app where you can generate beep sounds to
-        censor something weird like *BEEP* and *BEEEEEEP*, etc.\n\nEnter the frequency you want below: (Hz)</string>
+        censor something weird like *BEEP* and *BEEEEEEP*, etc.</string>
+    <string name="frequency_hint">Frequency (Hz, default: 1000)</string>
     <string name="beep">BEEP</string>
     <string name="favorites">Favorites</string>
     <string name="drawer_open">Favorites opened.</string>
