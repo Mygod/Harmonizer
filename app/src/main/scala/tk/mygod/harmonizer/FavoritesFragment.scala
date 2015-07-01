@@ -1,5 +1,6 @@
 package tk.mygod.harmonizer
 
+import android.app.Activity
 import android.content.{Intent, Context}
 import android.os.Bundle
 import android.support.v7.widget.{AppCompatEditText, DefaultItemAnimator, LinearLayoutManager, RecyclerView}
@@ -99,7 +100,12 @@ class FavoritesFragment extends CircularRevealFragment {
   private var favoritesAdapter: FavoritesAdapter = _
   private var selectedItem: FavoriteItem = _
 
-  override def onCreateSubView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
+  override def onAttach(activity: Activity) {
+    super.onAttach(activity)
+    activity.asInstanceOf[MainActivity].favoritesFragment = this
+  }
+
+  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
     val result = inflater.inflate(R.layout.fragment_favorites, container, false)
     configureToolbar(result, R.string.favorites, 0)
     result.findViewById(R.id.favorite_name_text).asInstanceOf[AppCompatEditText].setOnEditorActionListener(

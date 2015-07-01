@@ -1,5 +1,6 @@
 package tk.mygod.harmonizer
 
+import android.app.Activity
 import android.media.{AudioFormat, AudioManager, AudioTrack}
 import android.os.Bundle
 import android.support.v7.widget.AppCompatEditText
@@ -119,6 +120,11 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
     super.onPause
     muteTrack.pause
     stop
+  }
+
+  override def onAttach(activity: Activity) {
+    super.onAttach(activity)
+    activity.asInstanceOf[MainActivity].mainFragment = this
   }
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
