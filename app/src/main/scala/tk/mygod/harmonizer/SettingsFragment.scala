@@ -9,6 +9,8 @@ import tk.mygod.app.CircularRevealFragment
  * @author Mygod
  */
 final class SettingsFragment extends CircularRevealFragment {
+  override def isFullscreen = true
+
   override def onAttach(activity: Activity) {
     super.onAttach(activity)
     activity.asInstanceOf[MainActivity].settingsFragment = this

@@ -76,7 +76,7 @@ class FavoritesFragment extends CircularRevealFragment {
       favorites.remove(pos)
       update
       notifyItemRemoved(pos)
-      if (favorites.size == 0) empty.setVisibility(View.VISIBLE)
+      if (favorites.isEmpty) empty.setVisibility(View.VISIBLE)
     }
 
     def update {
@@ -99,6 +99,8 @@ class FavoritesFragment extends CircularRevealFragment {
 
   private var favoritesAdapter: FavoritesAdapter = _
   private var selectedItem: FavoriteItem = _
+
+  override def isFullscreen = true
 
   override def onAttach(activity: Activity) {
     super.onAttach(activity)

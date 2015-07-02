@@ -122,6 +122,8 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
     stop
   }
 
+  override def isFullscreen = true
+
   override def onAttach(activity: Activity) {
     super.onAttach(activity)
     activity.asInstanceOf[MainActivity].mainFragment = this
