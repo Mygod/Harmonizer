@@ -11,10 +11,7 @@ final class MainActivity extends FragmentStackActivity {
 
   protected override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
-    if (mainFragment == null) {
-      mainFragment = new MainFragment()
-      push(mainFragment)
-    }
+    if (mainFragment == null) push(new MainFragment)
   }
 
   def showSettings {
