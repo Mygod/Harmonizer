@@ -4,7 +4,8 @@
               android:background="?android:attr/windowBackground"
               android:focusable="true" android:focusableInTouchMode="true">
     <include layout="@layout/toolbar_light_dark" />
-    <tk.mygod.widget.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+    <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content">
         <android.support.v7.widget.AppCompatEditText android:id="@+id/favorite_name_text" android:singleLine="true"
                                                      android:layout_width="match_parent" android:imeOptions="actionSend"
                                                      android:layout_height="wrap_content"
@@ -12,7 +13,7 @@
                                                      android:hint="@string/favorite_name_text_hint"
                                                      android:nextFocusUp="@id/favorite_name_text"
                                                      android:nextFocusLeft="@id/favorite_name_text" />
-    </tk.mygod.widget.TextInputLayout>
+    </android.support.design.widget.TextInputLayout>
     <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView android:id="@+id/favorite" android:layout_width="match_parent"
                                                 android:layout_height="match_parent" />

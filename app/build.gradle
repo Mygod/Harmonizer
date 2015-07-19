@@ -20,8 +20,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 340
-        versionName "2.2.10.340"
+        versionCode 348
+        versionName "2.2.11.348"
     }
     buildTypes {
         debug {
@@ -42,5 +42,5 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':mygod-lib-android')
-    compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
 }

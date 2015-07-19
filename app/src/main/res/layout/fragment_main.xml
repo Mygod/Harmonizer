@@ -11,7 +11,8 @@
                                                          android:text="@string/welcoming_message"
                                                          android:layout_width="match_parent"
                                                          android:layout_height="wrap_content" />
-            <tk.mygod.widget.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content">
                 <android.support.v7.widget.AppCompatEditText android:id="@+id/frequency_text"
                                                              android:layout_width="match_parent"
                                                              android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
                                                              android:hint="@string/frequency_hint"
                                                              android:nextFocusUp="@id/frequency_text"
                                                              android:nextFocusLeft="@id/frequency_text" />
-            </tk.mygod.widget.TextInputLayout>
+            </android.support.design.widget.TextInputLayout>
             <android.support.v7.widget.AppCompatButton android:id="@+id/beep_button" android:text="@string/beep"
                                                        android:layout_weight="1" android:layout_width="match_parent"
                                                        android:minHeight="40sp" android:textColor="#fff"
