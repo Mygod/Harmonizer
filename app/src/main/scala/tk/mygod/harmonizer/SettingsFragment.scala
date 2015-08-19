@@ -12,6 +12,7 @@ final class SettingsFragment extends CircularRevealFragment {
   override def isFullscreen = true
 
   override def onAttach(activity: Activity) {
+    //noinspection ScalaDeprecation
     super.onAttach(activity)
     activity.asInstanceOf[MainActivity].settingsFragment = this
   }
