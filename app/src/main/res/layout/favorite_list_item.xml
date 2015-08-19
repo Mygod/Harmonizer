@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Based on: https://github.com/android/platform_frameworks_base/blob/master/core/res/res/layout/simple_list_item_1.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent" android:layout_height="wrap_content">
+    <TextView android:id="@android:id/text1" android:layout_width="0dp" android:layout_height="match_parent"
+              android:textAppearance="?android:attr/textAppearanceListItemSmall"
+              android:layout_weight="1" android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+              android:background="?android:attr/selectableItemBackground"
+              android:paddingEnd="?android:attr/listPreferredItemPaddingEnd" android:gravity="center_vertical" />
+    <ImageView android:id="@+id/action_share" android:layout_width="wrap_content" android:layout_height="wrap_content"
+               android:src="@drawable/ic_social_share" android:alpha=".8" android:layout_gravity="center_vertical"
+               android:background="?android:attr/selectableItemBackgroundBorderless"
+               android:contentDescription="@string/action_share" />
+</LinearLayout>

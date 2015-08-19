@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/share" android:title="@string/favorite_context_menu_share"
-          android:alphabeticShortcut="s" android:numericShortcut="1" />
-    <item android:id="@+id/remove" android:title="@string/favorite_context_menu_remove"
-          android:alphabeticShortcut="r" android:numericShortcut="2" />
-</menu>

@@ -1,7 +1,7 @@
 package tk.mygod.harmonizer
 
 import android.app.Activity
-import android.content.{Context, Intent}
+import android.content.{Intent, Context}
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView.ViewHolder
@@ -30,13 +30,11 @@ class FavoritesFragment extends CircularRevealFragment {
     private val text = itemView.findViewById(android.R.id.text1).asInstanceOf[TextView]
     itemView.setOnTouchListener(LocationObserver)
     itemView.setOnClickListener(this)
-    // TODO: registerForContextMenu(itemView)
-
-    {
-      val ta = getActivity.obtainStyledAttributes(Array(android.R.attr.selectableItemBackground))
-      itemView.setBackground(ta.getDrawable(0))
-      ta.recycle
-    }
+    itemView.findViewById(R.id.action_share).setOnClickListener((v: View) => {
+      startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+        .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content), item.getFullName)),
+        getString(R.string.share_title)))
+    })
 
     def bind(item: FavoriteItem) {
       this.item = item
@@ -64,7 +62,7 @@ class FavoritesFragment extends CircularRevealFragment {
     }
 
     def onCreateViewHolder(vg: ViewGroup, i: Int) = new FavoriteItemViewHolder(LayoutInflater.from(vg.getContext)
-      .inflate(android.R.layout.simple_list_item_1, vg, false))
+      .inflate(R.layout.favorite_list_item, vg, false))
     def onBindViewHolder(vh: FavoriteItemViewHolder, i: Int) = vh.bind(favorites(i))
     def getItemCount = favorites.size
 
@@ -129,10 +127,8 @@ class FavoritesFragment extends CircularRevealFragment {
   }
 
   private var favoritesAdapter: FavoritesAdapter = _
-  private var selectedItem: FavoriteItem = _
   private var removedSnackbar: Snackbar = _
   private val recycleBin = new ArrayBuffer[(Int, FavoriteItem)]
-  private var showingSnackbar: Boolean = _
 
   override def isFullscreen = true
 
@@ -182,26 +178,5 @@ class FavoritesFragment extends CircularRevealFragment {
       }
     }).attachToRecyclerView(favoriteList)
     result
-  }
-
-  override def onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
-    super.onCreateContextMenu(menu, v, menuInfo)
-    selectedItem = v.getTag.asInstanceOf[FavoriteItem]
-    getActivity.getMenuInflater.inflate(R.menu.context_menu_favorite, menu)
-    menu.setHeaderTitle(selectedItem.getFullName)
-  }
-
-  override def onContextItemSelected(item: MenuItem) = {
-    item.getItemId match {
-      case R.id.share =>
-        startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
-          .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content), selectedItem.getFullName)),
-          getString(R.string.share_title)))
-        true
-      case R.id.remove =>
-        favoritesAdapter.remove(selectedItem)
-        true
-      case _ => super.onContextItemSelected(item)
-    }
   }
 }
