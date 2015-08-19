@@ -1,9 +1,14 @@
 package tk.mygod.harmonizer
 
 import android.app.Activity
-import android.content.{Intent, Context}
+import android.content.{Context, Intent}
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v7.widget.RecyclerView.ViewHolder
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback
 import android.support.v7.widget.{AppCompatEditText, DefaultItemAnimator, LinearLayoutManager, RecyclerView}
+import android.view.View.OnAttachStateChangeListener
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
@@ -21,11 +26,11 @@ class FavoritesFragment extends CircularRevealFragment {
 
   private class FavoriteItemViewHolder(private val view: View) extends RecyclerView.ViewHolder(view)
     with View.OnClickListener {
-    private var item: FavoriteItem = _
+    var item: FavoriteItem = _
     private val text = itemView.findViewById(android.R.id.text1).asInstanceOf[TextView]
     itemView.setOnTouchListener(LocationObserver)
     itemView.setOnClickListener(this)
-    registerForContextMenu(itemView)
+    // TODO: registerForContextMenu(itemView)
 
     {
       val ta = getActivity.obtainStyledAttributes(Array(android.R.attr.selectableItemBackground))
@@ -71,12 +76,38 @@ class FavoritesFragment extends CircularRevealFragment {
       notifyItemInserted(pos)
     }
 
-    def remove(item: FavoriteItem) {
-      val pos: Int = favorites.indexOf(item)
+    def remove(pos: Int) {
       favorites.remove(pos)
       update
       notifyItemRemoved(pos)
       if (favorites.isEmpty) empty.setVisibility(View.VISIBLE)
+    }
+    def remove(item: FavoriteItem): Unit = remove(favorites.indexOf(item))
+
+    def move(from: Int, to: Int) {
+      if (from == to) return
+      val item = favorites(from)
+      val order = if (from > to) -1 else 1
+      var i = from
+      var j = from + order
+      while ((j <= from || j <= to) && (j >= from || j >= to)) {
+        favorites(i) = favorites(j)
+        i = j
+        j += order
+      }
+      favorites(to) = item
+      update
+      notifyItemMoved(from, to)
+    }
+
+    def undo(actions: ArrayBuffer[(Int, FavoriteItem)]) = {
+      for ((index, item) <- actions.reverseIterator) {
+        favorites.insert(index, item)
+        notifyItemInserted(index)
+      }
+      actions.clear
+      update
+      empty.setVisibility(View.GONE)
     }
 
     def update {
@@ -99,12 +130,28 @@ class FavoritesFragment extends CircularRevealFragment {
 
   private var favoritesAdapter: FavoritesAdapter = _
   private var selectedItem: FavoriteItem = _
+  private var removedSnackbar: Snackbar = _
+  private val recycleBin = new ArrayBuffer[(Int, FavoriteItem)]
+  private var showingSnackbar: Boolean = _
 
   override def isFullscreen = true
 
   override def onAttach(activity: Activity) {
+    //noinspection ScalaDeprecation
     super.onAttach(activity)
     activity.asInstanceOf[MainActivity].favoritesFragment = this
+  }
+
+  override def onActivityCreated(savedInstanceState: Bundle) {
+    super.onActivityCreated(savedInstanceState)
+    removedSnackbar = Snackbar.make(getView, R.string.removed, Snackbar.LENGTH_LONG)
+      .setAction(R.string.undo, (v: View) => favoritesAdapter.undo(recycleBin))
+    removedSnackbar.getView.addOnAttachStateChangeListener(new OnAttachStateChangeListener {
+      def onViewDetachedFromWindow(v: View) {
+        recycleBin.clear
+      }
+      def onViewAttachedToWindow(v: View) = ()
+    })
   }
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
@@ -121,6 +168,19 @@ class FavoritesFragment extends CircularRevealFragment {
     favoriteList.setItemAnimator(new DefaultItemAnimator)
     favoritesAdapter = new FavoritesAdapter(result.findViewById(android.R.id.empty))
     favoriteList.setAdapter(favoritesAdapter)
+    new ItemTouchHelper(new SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+      ItemTouchHelper.START | ItemTouchHelper.END) {
+      def onSwiped(viewHolder: ViewHolder, direction: Int) = {
+        val index = viewHolder.getAdapterPosition
+        favoritesAdapter.remove(index)
+        recycleBin.append((index, viewHolder.asInstanceOf[FavoriteItemViewHolder].item))
+        removedSnackbar.show
+      }
+      def onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean = {
+        favoritesAdapter.move(viewHolder.getAdapterPosition, target.getAdapterPosition)
+        true
+      }
+    }).attachToRecyclerView(favoriteList)
     result
   }
 

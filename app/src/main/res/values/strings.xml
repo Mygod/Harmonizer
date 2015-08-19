@@ -23,4 +23,7 @@
     <string name="settings_audio_bit_depth_8">8 bits</string>
     <string name="settings_audio_bit_depth_16">16 bits</string>
     <string name="settings_audio_bit_depth_float">32 bits (floating point)</string>
+
+    <string name="removed">Removed</string>
+    <string name="undo">Undo</string>
 </resources>
