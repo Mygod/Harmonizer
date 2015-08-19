@@ -3,7 +3,7 @@ package tk.mygod.harmonizer
 import android.app.Activity
 import android.os.Bundle
 import android.view.{LayoutInflater, ViewGroup}
-import tk.mygod.app.CircularRevealFragment
+import tk.mygod.app.{ActivityPlus, CircularRevealFragment}
 
 /**
  * @author Mygod
@@ -23,7 +23,7 @@ final class SettingsFragment extends CircularRevealFragment {
   }
 
   override def onDestroyView {
-    val activity = getActivity
+    val activity = getActivity.asInstanceOf[ActivityPlus]
     if (!activity.isFinishing && !activity.isDestroyed) {
       val manager = getFragmentManager
       val fragment = manager.findFragmentById(android.R.id.content)
