@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                                                xmlns:app="http://schemas.android.com/apk/res-auto">
     <tk.mygod.preference.NumberPickerPreference android:key="audio.samplingRate" app:summary="%d Hz"
+                                                app:fragment="tk.mygod.preference.NumberPickerPreferenceDialogFragment"
                                                 android:title="@string/settings_audio_sampling_rate"/>
     <tk.mygod.preference.DropDownPreference android:key="audio.bitDepth" app:summary="%s"
                                             android:title="@string/settings_audio_bit_depth"
                                             app:entries="@array/settings_audio_bit_depths"
                                             app:entryValues="@array/settings_audio_bit_depth_values"/>
-</PreferenceScreen>
+</android.support.v7.preference.PreferenceScreen>

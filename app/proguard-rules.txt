@@ -20,3 +20,14 @@
 -ignorewarnings
 # temporary workaround; see Scala issue SI-5397
 -keep class scala.collection.SeqLike { public protected *; }
+
+# src/main/res/xml/settings.xml
+-keepclasseswithmembers class android.support.v7.preference.PreferenceScreen {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class tk.mygod.preference.DropDownPreference {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class tk.mygod.preference.NumberPickerPreference {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}

@@ -1,19 +1,18 @@
 package tk.mygod.harmonizer
 
 import android.app.Activity
-import android.content.{Intent, Context}
+import android.content.{Context, Intent}
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback
 import android.support.v7.widget.{AppCompatEditText, DefaultItemAnimator, LinearLayoutManager, RecyclerView}
-import android.view.View.OnAttachStateChangeListener
+import android.view.View.{OnClickListener, OnAttachStateChangeListener}
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import tk.mygod.app.CircularRevealFragment
-import tk.mygod.util.MethodWrappers._
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
@@ -141,7 +140,7 @@ class FavoritesFragment extends CircularRevealFragment {
   override def onActivityCreated(savedInstanceState: Bundle) {
     super.onActivityCreated(savedInstanceState)
     removedSnackbar = Snackbar.make(getView, R.string.removed, Snackbar.LENGTH_LONG)
-      .setAction(R.string.undo, (v: View) => favoritesAdapter.undo(recycleBin))
+      .setAction(R.string.undo, ((v: View) => favoritesAdapter.undo(recycleBin)): OnClickListener)
     removedSnackbar.getView.addOnAttachStateChangeListener(new OnAttachStateChangeListener {
       def onViewDetachedFromWindow(v: View) {
         recycleBin.clear

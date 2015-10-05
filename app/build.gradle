@@ -16,7 +16,7 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.0'
+    buildToolsVersion '23.0.1'
 
     defaultConfig {
         minSdkVersion 16
@@ -43,5 +43,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':mygod-lib-android')
-    compile 'com.android.support:recyclerview-v7:23.0.0'
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.additionalParameters = ["-Xexperimental"]
 }
