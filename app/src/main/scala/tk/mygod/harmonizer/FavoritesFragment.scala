@@ -29,12 +29,20 @@ class FavoritesFragment extends CircularRevealFragment {
     private val text = itemView.findViewById(android.R.id.text1).asInstanceOf[TextView]
     itemView.setOnTouchListener(LocationObserver)
     itemView.setOnClickListener(this)
-    itemView.findViewById(R.id.action_share).setOnClickListener((v: View) => {
-      startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
-        .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content), item.getFullName)),
-        getString(R.string.share_title)))
-    })
 
+    {
+      val share = itemView.findViewById(R.id.action_share)
+      share.setOnClickListener((v: View) => {
+        startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+          .putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_content), item.getFullName)),
+          getString(R.string.share_title)))
+      })
+      share.setOnLongClickListener((v: View) => {
+        showToast(R.string.action_share)
+        true
+      })
+    }
+    
     def bind(item: FavoriteItem) {
       this.item = item
       text.setText(item.getFullName)
