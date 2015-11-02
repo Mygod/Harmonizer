@@ -42,7 +42,7 @@ class FavoritesFragment extends CircularRevealFragment {
         true
       })
     }
-    
+
     def bind(item: FavoriteItem) {
       this.item = item
       text.setText(item.getFullName)
