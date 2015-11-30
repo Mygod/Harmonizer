@@ -9,7 +9,6 @@
     <string name="drawer_close">收藏夹已关闭。</string>
     <string name="favorite_empty_hint">点击添加按钮将当前频率添加到收藏夹。长按可执行更多操作。</string>
     <string name="action_share">共享</string>
-    <string name="share_title">发送到……</string>
     <string name="share_content">当我心情忧伤奔向山里\n就会听到昔日 %s 的声音\n你的心也将随之歌唱\n只需使用和谐器</string>
     <string name="favorite_name_text_hint">当前频率的昵称</string>
     <string name="settings">高级设置</string>

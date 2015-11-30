@@ -2,7 +2,7 @@ package tk.mygod.harmonizer
 
 import android.content.Context
 import android.media.{AudioFormat, AudioTrack}
-import android.os.Build
+import tk.mygod.os.Build
 
 /**
  * @author Mygod
@@ -36,7 +36,7 @@ final class AudioConfig(context: Context) {
     if (result > AudioConfig.maxSamplingRate) AudioConfig.maxSamplingRate
     else if (result < AudioConfig.minSamplingRate) AudioConfig.minSamplingRate else result
   }
-  def getFormat = preferences.getString("audio.bitDepth", (if (Build.VERSION.SDK_INT >= 21)
+  def getFormat = preferences.getString("audio.bitDepth", (if (Build.version >= 21)
     AudioFormat.ENCODING_PCM_FLOAT else AudioFormat.ENCODING_PCM_16BIT).toString).toInt
 
   def changed = {

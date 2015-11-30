@@ -7,9 +7,12 @@ import android.support.v7.widget.AppCompatEditText
 import android.support.v7.widget.Toolbar.OnMenuItemClickListener
 import android.view._
 import tk.mygod.app.ToolbarFragment
+import tk.mygod.harmonizer.TypedResource._
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.Future
 
 /**
  * @author Mygod
@@ -131,33 +134,30 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
     val result = inflater.inflate(R.layout.fragment_main, container, false)
-    frequencyText = result.findViewById(R.id.frequency_text).asInstanceOf[AppCompatEditText]
+    frequencyText = result.findView(TR.frequency_text)
     configureToolbar(result, R.string.app_name)
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener(this)
     result.findViewById(R.id.settings).setOnTouchListener(LocationObserver)
     result.findViewById(R.id.favorites).setOnTouchListener(LocationObserver)
-    val button = result.findViewById(R.id.beep_button)
-    button.setOnTouchListener((v: View, event: MotionEvent) => {
+    result.findViewById(R.id.beep_button).setOnTouchListener((v: View, event: MotionEvent) => {
       result.findViewById(R.id.scroller).asInstanceOf[ViewGroup].requestDisallowInterceptTouchEvent(true)
       event.getAction match {
         case MotionEvent.ACTION_DOWN =>
           pressed = true
-          new Thread {
-            override def run {
-              val frequency = getFrequency
-              if (audioConfig.changed || savedFrequency != frequency) {
-                savedFrequency = frequency
-                if (savedTrack != null) {
-                  savedTrack.stop
-                  savedTrack.release
-                  savedTrack = null
-                }
-                savedTrack = generateTrack(frequency)
+          Future {
+            val frequency = getFrequency
+            if (audioConfig.changed || savedFrequency != frequency) {
+              savedFrequency = frequency
+              if (savedTrack != null) {
+                savedTrack.stop
+                savedTrack.release
+                savedTrack = null
               }
-              if (savedTrack != null && pressed) savedTrack.play
+              savedTrack = generateTrack(frequency)
             }
-          }.start
+            if (savedTrack != null && pressed) savedTrack.play
+          }
         case MotionEvent.ACTION_UP => stop
         case _ =>
       }

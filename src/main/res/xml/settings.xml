@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                                                 xmlns:app="http://schemas.android.com/apk/res-auto">
-    <tk.mygod.preference.NumberPickerPreference android:key="audio.samplingRate" app:summary="%d Hz"
+    <tk.mygod.preference.NumberPickerPreference android:key="audio.samplingRate" android:summary="%d Hz"
                                                 android:title="@string/settings_audio_sampling_rate"/>
-    <tk.mygod.preference.DropDownPreference android:key="audio.bitDepth" app:summary="%s"
+    <tk.mygod.preference.DropDownPreference android:key="audio.bitDepth" android:summary="%s"
                                             android:title="@string/settings_audio_bit_depth"
                                             app:entries="@array/settings_audio_bit_depths"
                                             app:entryValues="@array/settings_audio_bit_depth_values"/>
