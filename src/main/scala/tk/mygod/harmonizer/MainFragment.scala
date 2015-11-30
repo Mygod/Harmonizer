@@ -140,7 +140,7 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
     toolbar.setOnMenuItemClickListener(this)
     result.findViewById(R.id.settings).setOnTouchListener(LocationObserver)
     result.findViewById(R.id.favorites).setOnTouchListener(LocationObserver)
-    result.findViewById(R.id.beep_button).setOnTouchListener((v: View, event: MotionEvent) => {
+    result.findViewById(R.id.beep_button).setOnTouchListener((v, event) => {
       result.findViewById(R.id.scroller).asInstanceOf[ViewGroup].requestDisallowInterceptTouchEvent(true)
       event.getAction match {
         case MotionEvent.ACTION_DOWN =>

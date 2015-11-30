@@ -146,7 +146,7 @@ class FavoritesFragment extends CircularRevealFragment {
   override def onActivityCreated(savedInstanceState: Bundle) {
     super.onActivityCreated(savedInstanceState)
     removedSnackbar = Snackbar.make(getView, R.string.removed, Snackbar.LENGTH_LONG)
-      .setAction(R.string.undo, ((v: View) => favoritesAdapter.undo(recycleBin)): OnClickListener)
+      .setAction(R.string.undo, (_ => favoritesAdapter.undo(recycleBin)): OnClickListener)
     removedSnackbar.getView.addOnAttachStateChangeListener(new OnAttachStateChangeListener {
       def onViewDetachedFromWindow(v: View) {
         recycleBin.clear
@@ -158,10 +158,10 @@ class FavoritesFragment extends CircularRevealFragment {
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
     val result = inflater.inflate(R.layout.fragment_favorites, container, false)
     configureToolbar(result, R.string.favorites, 0)
-    result.findView(TR.favorite_name_text).setOnEditorActionListener(
-      (v: TextView, actionId: Int, event: KeyEvent) => if (actionId == EditorInfo.IME_ACTION_SEND) {
-        favoritesAdapter.add(new FavoriteItem(v.getText.toString, mainFragment.getFrequency))
-        v.setText(null)
+    result.findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
+      if (actionId == EditorInfo.IME_ACTION_SEND) {
+        favoritesAdapter.add(new FavoriteItem(textView.getText.toString, mainFragment.getFrequency))
+        textView.setText(null)
         true
       } else false)
     val favoriteList = result.findView(TR.favorite)
