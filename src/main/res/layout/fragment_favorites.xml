@@ -5,7 +5,8 @@
               android:focusable="true" android:focusableInTouchMode="true">
     <include layout="@layout/toolbar_light_dark" />
     <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-                                                   android:layout_height="wrap_content">
+                                                   android:background="@android:color/white"
+                                                   android:layout_height="wrap_content" android:elevation="1dp">
         <android.support.v7.widget.AppCompatEditText android:id="@+id/favorite_name_text" android:singleLine="true"
                                                      android:layout_width="match_parent" android:imeOptions="actionSend"
                                                      android:layout_height="wrap_content"
