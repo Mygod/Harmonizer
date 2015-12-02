@@ -5,6 +5,7 @@
         censor something weird like *BEEP* and *BEEEEEEP*, etc.</string>
     <string name="frequency_hint">Frequency (Hz, default: 1000)</string>
     <string name="beep">BEEP</string>
+    <string name="volume_off">Volume is off</string>
     <string name="favorites">Favorites</string>
     <string name="drawer_open">Favorites opened.</string>
     <string name="drawer_close">Favorites closed.</string>

@@ -5,25 +5,28 @@ import android.media.{AudioFormat, AudioManager, AudioTrack}
 import android.os.Bundle
 import android.support.v7.widget.AppCompatEditText
 import android.support.v7.widget.Toolbar.OnMenuItemClickListener
+import android.util.Log
 import android.view._
 import tk.mygod.app.ToolbarFragment
 import tk.mygod.harmonizer.TypedResource._
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 /**
  * @author Mygod
  */
 class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
-  lazy val audioConfig = new AudioConfig(getActivity)
+  private var activity: MainActivity = _
+  private lazy val audioConfig = new AudioConfig(activity)
   // recycling ArrayBuffer ;-)
-  var byteBuffer: ArrayBuffer[Byte] = _
-  var shortBuffer: ArrayBuffer[Short] = _
-  var floatBuffer: ArrayBuffer[Float] = _
-  private def shift[T: Manifest](buffer: ArrayBuffer[T], i: Int) = {
+  private var byteBuffer: ArrayBuffer[Byte] = _
+  private var shortBuffer: ArrayBuffer[Short] = _
+  private var floatBuffer: ArrayBuffer[Float] = _
+  private def shift[T](buffer: ArrayBuffer[T], i: Int)(implicit m: ClassTag[T]) = {
     val delta = i * 3 / 4
     val result = new Array[T](i)
     var s = 0
@@ -94,14 +97,15 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
     }
   }
 
-  private var savedFrequency = .0
+  private var savedFrequency: Double = _
   private var savedTrack: AudioTrack = _
   private val muteTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
     AudioFormat.ENCODING_PCM_16BIT, 32, AudioTrack.MODE_STATIC)
   muteTrack.write(new Array[Short](16), 0, 16)
   muteTrack.setLoopPoints(0, 16, -1)
   var frequencyText: AppCompatEditText = _
-  private var pressed = false
+  private var pressed: Boolean = _
+  private var muteNeedsNoting = true
 
   def getFrequency = try frequencyText.getText.toString.toDouble
     catch {
@@ -129,7 +133,8 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
   override def onAttach(activity: Activity) {
     //noinspection ScalaDeprecation
     super.onAttach(activity)
-    activity.asInstanceOf[MainActivity].mainFragment = this
+    this.activity = activity.asInstanceOf[MainActivity]
+    this.activity.mainFragment = this
   }
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
@@ -156,7 +161,12 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
               }
               savedTrack = generateTrack(frequency)
             }
-            if (savedTrack != null && pressed) savedTrack.play
+            if (savedTrack != null && pressed) {
+              savedTrack.play
+              if (muteNeedsNoting && activity.systemService[AudioManager]
+                .getStreamVolume(AudioManager.STREAM_MUSIC) <= 0) runOnUiThread(showToast(R.string.volume_off))
+              muteNeedsNoting = false
+            }
           }
         case MotionEvent.ACTION_UP => stop
         case _ =>
@@ -167,13 +177,12 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
   }
 
   def onMenuItemClick(menuItem: MenuItem) = {
-    val parent = getActivity.asInstanceOf[MainActivity]
     menuItem.getItemId match {
       case R.id.settings =>
-        parent.showSettings
+        activity.showSettings
         true
       case R.id.favorites =>
-        parent.showFavorites
+        activity.showFavorites
         true
       case _ => super.onOptionsItemSelected(menuItem)
     }
