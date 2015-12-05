@@ -186,4 +186,11 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
       case _ => super.onOptionsItemSelected(menuItem)
     }
   }
+
+  override def onKeyUp(keyCode: Int, event: KeyEvent) = keyCode match {
+    case KeyEvent.KEYCODE_MENU =>
+      activity.showSettings
+      true
+    case _ => super.onKeyUp(keyCode, event)
+  }
 }

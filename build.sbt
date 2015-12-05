@@ -16,4 +16,4 @@ shrinkResources in Android := true
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "1.3.4"
+libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "1.3.6-SNAPSHOT"
