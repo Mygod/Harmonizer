@@ -2,14 +2,33 @@ package tk.mygod.harmonizer
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.{LayoutInflater, ViewGroup}
-import tk.mygod.app.{ActivityPlus, CircularRevealFragment}
+import android.support.v7.preference.Preference
+import android.view.View
+import tk.mygod.app.ToolbarFragment
+import tk.mygod.preference.{NumberPickerPreferenceDialogFragment, DropDownPreference, NumberPickerPreference, ToolbarPreferenceFragment}
 
 /**
  * @author Mygod
  */
-final class SettingsFragment extends CircularRevealFragment {
-  override def isFullscreen = true
+final class SettingsFragment extends ToolbarPreferenceFragment {
+  override def layout = R.layout.fragment_settings
+
+  override def onViewCreated(view: View, savedInstanceState: Bundle) {
+    super.onViewCreated(view, savedInstanceState)
+    configureToolbar(view, R.string.settings)
+    setNavigationIcon(ToolbarFragment.BACK)
+  }
+
+  def onCreatePreferences(savedInstanceState: Bundle, rootKey: String) {
+    getPreferenceManager.setSharedPreferencesName("settings")
+    addPreferencesFromResource(R.xml.settings)
+    val config = new AudioConfig(getActivity)
+    val samplingRate = findPreference("audio.samplingRate").asInstanceOf[NumberPickerPreference]
+    samplingRate.setMin(AudioConfig.minSamplingRate)
+    samplingRate.setMax(AudioConfig.maxSamplingRate)
+    samplingRate.setValue(config.getSamplingRate)
+    findPreference("audio.bitDepth").asInstanceOf[DropDownPreference].setValue(config.getFormat.toString)
+  }
 
   override def onAttach(activity: Activity) {
     //noinspection ScalaDeprecation
@@ -17,19 +36,8 @@ final class SettingsFragment extends CircularRevealFragment {
     activity.asInstanceOf[MainActivity].settingsFragment = this
   }
 
-  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
-    val result = inflater.inflate(R.layout.fragment_settings, container, false)
-    configureToolbar(result, R.string.settings, 0)
-    result
-  }
-
-  override def onDestroyView {
-    val activity = getActivity.asInstanceOf[ActivityPlus]
-    if (!activity.isFinishing && !activity.isDestroyed) {
-      val manager = getFragmentManager
-      val fragment = manager.findFragmentById(android.R.id.content)
-      if (fragment != null) manager.beginTransaction.remove(fragment).commitAllowingStateLoss
-    }
-    super.onDestroyView
-  }
+  override def onDisplayPreferenceDialog(preference: Preference) =
+    if (preference.isInstanceOf[NumberPickerPreference])
+      displayPreferenceDialog(new NumberPickerPreferenceDialogFragment(preference.getKey))
+    else super.onDisplayPreferenceDialog(preference)
 }

@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
 /**
  * @author Mygod
  */
-class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
+final class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
   private var activity: MainActivity = _
   private lazy val audioConfig = new AudioConfig(activity)
   // recycling ArrayBuffer ;-)
@@ -136,16 +136,18 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
     this.activity.mainFragment = this
   }
 
-  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
-    val result = inflater.inflate(R.layout.fragment_main, container, false)
-    frequencyText = result.findView(TR.frequency_text)
-    configureToolbar(result, R.string.app_name)
+  def layout = R.layout.fragment_main
+
+  override def onViewCreated(view: View, savedInstanceState: Bundle) = {
+    super.onViewCreated(view, savedInstanceState)
+    frequencyText = view.findView(TR.frequency_text)
+    configureToolbar(view, R.string.app_name)
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener(this)
-    result.findViewById(R.id.settings).setOnTouchListener(LocationObserver)
-    result.findViewById(R.id.favorites).setOnTouchListener(LocationObserver)
-    result.findViewById(R.id.beep_button).setOnTouchListener((v, event) => {
-      result.findViewById(R.id.scroller).asInstanceOf[ViewGroup].requestDisallowInterceptTouchEvent(true)
+    view.findViewById(R.id.settings).setOnTouchListener(LocationObserver)
+    view.findViewById(R.id.favorites).setOnTouchListener(LocationObserver)
+    view.findViewById(R.id.beep_button).setOnTouchListener((v, event) => {
+      view.findViewById(R.id.scroller).asInstanceOf[ViewGroup].requestDisallowInterceptTouchEvent(true)
       event.getAction match {
         case MotionEvent.ACTION_DOWN =>
           pressed = true
@@ -163,7 +165,7 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
             if (savedTrack != null && pressed) {
               savedTrack.play
               if (muteNeedsNoting && activity.systemService[AudioManager]
-                .getStreamVolume(AudioManager.STREAM_MUSIC) <= 0) runOnUiThread(showToast(R.string.volume_off))
+                .getStreamVolume(AudioManager.STREAM_MUSIC) <= 0) runOnUiThread(makeToast(R.string.volume_off).show)
               muteNeedsNoting = false
             }
           }
@@ -172,7 +174,6 @@ class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
       }
       false
     })
-    result
   }
 
   def onMenuItemClick(menuItem: MenuItem) = {

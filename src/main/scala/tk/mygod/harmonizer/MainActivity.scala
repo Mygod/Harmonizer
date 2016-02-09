@@ -15,14 +15,14 @@ final class MainActivity extends FragmentStackActivity {
   }
 
   def showSettings {
-    if (settingsFragment == null) settingsFragment = new SettingsFragment
-    settingsFragment.setSpawnLocation(LocationObserver.getOnScreen(findViewById(R.id.settings)))
-    push(settingsFragment)
+    val fragment = if (settingsFragment == null) new SettingsFragment else settingsFragment
+    fragment.setSpawnLocation(LocationObserver.getOnScreen(findViewById(R.id.settings)))
+    push(fragment)
   }
 
   def showFavorites {
-    if (favoritesFragment == null) favoritesFragment = new FavoritesFragment
-    favoritesFragment.setSpawnLocation(LocationObserver.getOnScreen(findViewById(R.id.favorites)))
-    push(favoritesFragment)
+    val fragment = if (favoritesFragment == null) new FavoritesFragment else favoritesFragment
+    fragment.setSpawnLocation(LocationObserver.getOnScreen(findViewById(R.id.favorites)))
+    push(fragment)
   }
 }

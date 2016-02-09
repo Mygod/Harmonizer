@@ -12,7 +12,7 @@ import android.view.View.{OnAttachStateChangeListener, OnClickListener}
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import tk.mygod.app.CircularRevealFragment
+import tk.mygod.app.{ToolbarFragment, CircularRevealFragment}
 import tk.mygod.harmonizer.TypedResource._
 import tk.mygod.view.LocationObserver
 
@@ -21,11 +21,11 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * @author Mygod
  */
-class FavoritesFragment extends CircularRevealFragment {
+final class FavoritesFragment extends CircularRevealFragment {
   private lazy val mainActivity = getActivity.asInstanceOf[MainActivity]
   private lazy val mainFragment = mainActivity.mainFragment
 
-  private class FavoriteItemViewHolder(private val view: View) extends RecyclerView.ViewHolder(view)
+  private final class FavoriteItemViewHolder(private val view: View) extends RecyclerView.ViewHolder(view)
     with View.OnClickListener {
     var item: FavoriteItem = _
     private val text = itemView.findViewById(android.R.id.text1).asInstanceOf[TextView]
@@ -36,7 +36,7 @@ class FavoritesFragment extends CircularRevealFragment {
       val share = itemView.findViewById(R.id.action_share)
       share.setOnClickListener(_ => mainActivity.share(getString(R.string.share_content, item.getFullName), item.name))
       share.setOnLongClickListener(_ => {
-        showToast(R.string.action_share)
+        makeToast(R.string.action_share).show
         true
       })
     }
@@ -53,7 +53,7 @@ class FavoritesFragment extends CircularRevealFragment {
     }
   }
 
-  private class FavoritesAdapter(private val empty: View) extends RecyclerView.Adapter[FavoriteItemViewHolder] {
+  private final class FavoritesAdapter(private val empty: View) extends RecyclerView.Adapter[FavoriteItemViewHolder] {
     private val favorites = new ArrayBuffer[FavoriteItem]
     private val pref = mainActivity.getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
@@ -155,19 +155,22 @@ class FavoritesFragment extends CircularRevealFragment {
     })
   }
 
-  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = {
-    val result = inflater.inflate(R.layout.fragment_favorites, container, false)
-    configureToolbar(result, R.string.favorites, 0)
-    result.findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
+  def layout = R.layout.fragment_favorites
+
+  override def onViewCreated(view: View, savedInstanceState: Bundle) = {
+    super.onViewCreated(view, savedInstanceState)
+    configureToolbar(view, R.string.favorites)
+    setNavigationIcon(ToolbarFragment.BACK)
+    view.findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
       if (actionId == EditorInfo.IME_ACTION_SEND) {
         favoritesAdapter.add(new FavoriteItem(textView.getText.toString, mainFragment.getFrequency))
         textView.setText(null)
         true
       } else false)
-    val favoriteList = result.findView(TR.favorite)
+    val favoriteList = view.findView(TR.favorite)
     favoriteList.setLayoutManager(new LinearLayoutManager(mainActivity))
     favoriteList.setItemAnimator(new DefaultItemAnimator)
-    favoritesAdapter = new FavoritesAdapter(result.findViewById(android.R.id.empty))
+    favoritesAdapter = new FavoritesAdapter(view.findViewById(android.R.id.empty))
     favoriteList.setAdapter(favoritesAdapter)
     new ItemTouchHelper(new SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
       ItemTouchHelper.START | ItemTouchHelper.END) {
@@ -182,6 +185,5 @@ class FavoritesFragment extends CircularRevealFragment {
         true
       }
     }).attachToRecyclerView(favoriteList)
-    result
   }
 }
