@@ -23,6 +23,9 @@
     <string name="settings_audio_bit_depth_16">16 bits</string>
     <string name="settings_audio_bit_depth_float">32 bits (floating point)</string>
 
-    <string name="removed">Removed</string>
+    <plurals name="removed">
+        <item quantity="one">Removed</item>
+        <item quantity="other">%d items removed</item>
+    </plurals>
     <string name="undo">Undo</string>
 </resources>

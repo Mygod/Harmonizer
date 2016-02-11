@@ -3,16 +3,14 @@ package tk.mygod.harmonizer
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback
 import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, RecyclerView}
-import android.view.View.{OnAttachStateChangeListener, OnClickListener}
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import tk.mygod.app.{ToolbarFragment, CircularRevealFragment}
+import tk.mygod.app.{CircularRevealFragment, ToolbarFragment}
 import tk.mygod.harmonizer.TypedResource._
 import tk.mygod.view.LocationObserver
 
@@ -103,12 +101,11 @@ final class FavoritesFragment extends CircularRevealFragment {
       notifyItemMoved(from, to)
     }
 
-    def undo(actions: ArrayBuffer[(Int, FavoriteItem)]) = {
-      for ((index, item) <- actions.reverseIterator) {
+    def undo(actions: Iterator[(Int, FavoriteItem)]) = {
+      for ((index, item) <- actions) {
         favorites.insert(index, item)
         notifyItemInserted(index)
       }
-      actions.clear
       update
       empty.setVisibility(View.GONE)
     }
@@ -132,8 +129,7 @@ final class FavoritesFragment extends CircularRevealFragment {
   }
 
   private var favoritesAdapter: FavoritesAdapter = _
-  private var removedSnackbar: Snackbar = _
-  private val recycleBin = new ArrayBuffer[(Int, FavoriteItem)]
+  private var undoManager: UndoSnackbarManager[FavoriteItem] = _
 
   override def isFullscreen = true
 
@@ -141,18 +137,6 @@ final class FavoritesFragment extends CircularRevealFragment {
     //noinspection ScalaDeprecation
     super.onAttach(activity)
     activity.asInstanceOf[MainActivity].favoritesFragment = this
-  }
-
-  override def onActivityCreated(savedInstanceState: Bundle) {
-    super.onActivityCreated(savedInstanceState)
-    removedSnackbar = Snackbar.make(getView, R.string.removed, Snackbar.LENGTH_LONG)
-      .setAction(R.string.undo, (_ => favoritesAdapter.undo(recycleBin)): OnClickListener)
-    removedSnackbar.getView.addOnAttachStateChangeListener(new OnAttachStateChangeListener {
-      def onViewDetachedFromWindow(v: View) {
-        recycleBin.clear
-      }
-      def onViewAttachedToWindow(v: View) = ()
-    })
   }
 
   def layout = R.layout.fragment_favorites
@@ -172,18 +156,23 @@ final class FavoritesFragment extends CircularRevealFragment {
     favoriteList.setItemAnimator(new DefaultItemAnimator)
     favoritesAdapter = new FavoritesAdapter(view.findViewById(android.R.id.empty))
     favoriteList.setAdapter(favoritesAdapter)
+    undoManager = new UndoSnackbarManager[FavoriteItem](view, favoritesAdapter.undo)
     new ItemTouchHelper(new SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
       ItemTouchHelper.START | ItemTouchHelper.END) {
       def onSwiped(viewHolder: ViewHolder, direction: Int) = {
         val index = viewHolder.getAdapterPosition
         favoritesAdapter.remove(index)
-        recycleBin.append((index, viewHolder.asInstanceOf[FavoriteItemViewHolder].item))
-        removedSnackbar.show
+        undoManager.remove(index, viewHolder.asInstanceOf[FavoriteItemViewHolder].item)
       }
-      def onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean = {
+      def onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder) = {
         favoritesAdapter.move(viewHolder.getAdapterPosition, target.getAdapterPosition)
         true
       }
     }).attachToRecyclerView(favoriteList)
+  }
+
+  override def onDestroy {
+    undoManager.flush
+    super.onDestroy
   }
 }
