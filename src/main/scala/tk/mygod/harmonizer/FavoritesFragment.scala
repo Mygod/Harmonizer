@@ -70,6 +70,7 @@ final class FavoritesFragment extends CircularRevealFragment {
     def getItemCount = favorites.size
 
     def add(item: FavoriteItem) {
+      undoManager.flush
       val pos = favorites.size
       favorites += item
       update
@@ -87,6 +88,7 @@ final class FavoritesFragment extends CircularRevealFragment {
 
     def move(from: Int, to: Int) {
       if (from == to) return
+      undoManager.flush
       val item = favorites(from)
       val order = if (from > to) -1 else 1
       var i = from
