@@ -10,7 +10,7 @@ import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, Recy
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import tk.mygod.app.{CircularRevealFragment, ToolbarFragment}
+import tk.mygod.app.{CircularRevealFragment, ToolbarTypedFindView}
 import tk.mygod.harmonizer.TypedResource._
 import tk.mygod.view.LocationObserver
 
@@ -145,8 +145,8 @@ final class FavoritesFragment extends CircularRevealFragment {
 
   override def onViewCreated(view: View, savedInstanceState: Bundle) = {
     super.onViewCreated(view, savedInstanceState)
-    configureToolbar(view, R.string.favorites)
-    setNavigationIcon(ToolbarFragment.BACK)
+    configureToolbar(R.string.favorites)
+    setNavigationIcon(ToolbarTypedFindView.BACK)
     view.findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
       if (actionId == EditorInfo.IME_ACTION_SEND) {
         favoritesAdapter.add(new FavoriteItem(textView.getText.toString, mainFragment.getFrequency))

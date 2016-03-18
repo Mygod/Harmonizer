@@ -141,7 +141,7 @@ final class MainFragment extends ToolbarFragment with OnMenuItemClickListener {
   override def onViewCreated(view: View, savedInstanceState: Bundle) = {
     super.onViewCreated(view, savedInstanceState)
     frequencyText = view.findView(TR.frequency_text)
-    configureToolbar(view, R.string.app_name)
+    configureToolbar(R.string.app_name)
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener(this)
     view.findViewById(R.id.settings).setOnTouchListener(LocationObserver)

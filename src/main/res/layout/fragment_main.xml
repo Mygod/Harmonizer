@@ -23,9 +23,9 @@
             </android.support.design.widget.TextInputLayout>
             <android.support.v7.widget.AppCompatButton android:id="@+id/beep_button" android:text="@string/beep"
                                                        android:layout_weight="1" android:layout_width="match_parent"
-                                                       android:minHeight="40sp" android:textColor="#fff"
+                                                       android:minHeight="40sp" android:textStyle="bold"
                                                        android:textSize="30sp" android:layout_height="0dp"
-                                                       android:textStyle="bold" />
+                                                       style="@style/Widget.AppCompat.Button.Colored" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

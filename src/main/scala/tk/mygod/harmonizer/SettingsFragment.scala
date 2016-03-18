@@ -4,8 +4,8 @@ import android.app.Activity
 import android.os.Bundle
 import android.support.v7.preference.Preference
 import android.view.View
-import tk.mygod.app.ToolbarFragment
-import tk.mygod.preference.{NumberPickerPreferenceDialogFragment, DropDownPreference, NumberPickerPreference, ToolbarPreferenceFragment}
+import tk.mygod.app.ToolbarTypedFindView
+import tk.mygod.preference.{DropDownPreference, NumberPickerPreference, NumberPickerPreferenceDialogFragment, ToolbarPreferenceFragment}
 
 /**
  * @author Mygod
@@ -15,8 +15,8 @@ final class SettingsFragment extends ToolbarPreferenceFragment {
 
   override def onViewCreated(view: View, savedInstanceState: Bundle) {
     super.onViewCreated(view, savedInstanceState)
-    configureToolbar(view, R.string.settings)
-    setNavigationIcon(ToolbarFragment.BACK)
+    configureToolbar(R.string.settings)
+    setNavigationIcon(ToolbarTypedFindView.BACK)
   }
 
   def onCreatePreferences(savedInstanceState: Bundle, rootKey: String) {
