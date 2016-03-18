@@ -24,3 +24,4 @@
                                                      android:text="@string/favorite_empty_hint" />
     </FrameLayout>
 </LinearLayout>
+

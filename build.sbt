@@ -6,7 +6,7 @@ platformTarget in Android := "android-23"
 
 name := "Harmonizer"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 javacOptions ++= Seq("-source", "1.6", "-target", "1.6")
 
@@ -16,4 +16,4 @@ shrinkResources in Android := true
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "1.3.10"
+libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "1.3.11-SNAPSHOT"
