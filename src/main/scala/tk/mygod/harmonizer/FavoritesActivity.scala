@@ -1,6 +1,5 @@
 package tk.mygod.harmonizer
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView.ViewHolder
@@ -10,8 +9,7 @@ import android.support.v7.widget.{DefaultItemAnimator, LinearLayoutManager, Recy
 import android.view._
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import tk.mygod.app.{CircularRevealFragment, ToolbarTypedFindView}
-import tk.mygod.harmonizer.TypedResource._
+import tk.mygod.app.{CircularRevealActivity, ToolbarActivity}
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
@@ -19,10 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * @author Mygod
  */
-final class FavoritesFragment extends CircularRevealFragment {
-  private lazy val mainActivity = getActivity.asInstanceOf[MainActivity]
-  private lazy val mainFragment = mainActivity.mainFragment
-
+final class FavoritesActivity extends ToolbarActivity with CircularRevealActivity with TypedFindView {
   private final class FavoriteItemViewHolder(private val view: View) extends RecyclerView.ViewHolder(view)
     with View.OnClickListener {
     var item: FavoriteItem = _
@@ -32,7 +27,8 @@ final class FavoritesFragment extends CircularRevealFragment {
 
     {
       val share = itemView.findViewById(R.id.action_share)
-      share.setOnClickListener(_ => mainActivity.share(getString(R.string.share_content, item.getFullName), item.name))
+      share.setOnClickListener(_ =>
+        FavoritesActivity.this.share(getString(R.string.share_content, item.getFullName), item.name))
       share.setOnLongClickListener(_ => {
         makeToast(R.string.action_share).show
         true
@@ -46,14 +42,14 @@ final class FavoritesFragment extends CircularRevealFragment {
     }
 
     def onClick(v: View) {
-      mainFragment.frequencyText.setText(Utils.betterToString(item.frequency))
-      exit(v)
+      MainActivity.instance.frequencyText.setText(Utils.betterToString(item.frequency))
+      supportFinishAfterTransition()
     }
   }
 
   private final class FavoritesAdapter(private val empty: View) extends RecyclerView.Adapter[FavoriteItemViewHolder] {
     private val favorites = new ArrayBuffer[FavoriteItem]
-    private val pref = mainActivity.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+    private val pref = getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
     {
       val size = pref.getInt("size", 0)
@@ -133,32 +129,23 @@ final class FavoritesFragment extends CircularRevealFragment {
   private var favoritesAdapter: FavoritesAdapter = _
   private var undoManager: UndoSnackbarManager[FavoriteItem] = _
 
-  override def isFullscreen = true
-
-  override def onAttach(activity: Activity) {
-    //noinspection ScalaDeprecation
-    super.onAttach(activity)
-    activity.asInstanceOf[MainActivity].favoritesFragment = this
-  }
-
-  def layout = R.layout.fragment_favorites
-
-  override def onViewCreated(view: View, savedInstanceState: Bundle) = {
-    super.onViewCreated(view, savedInstanceState)
-    configureToolbar(R.string.favorites)
-    setNavigationIcon(ToolbarTypedFindView.BACK)
-    view.findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
+  protected override def onCreate(savedInstanceState: Bundle) = {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_favorites)
+    configureToolbar()
+    setNavigationIcon()
+    findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
       if (actionId == EditorInfo.IME_ACTION_SEND) {
-        favoritesAdapter.add(new FavoriteItem(textView.getText.toString, mainFragment.getFrequency))
+        favoritesAdapter.add(new FavoriteItem(textView.getText.toString, MainActivity.instance.getFrequency))
         textView.setText(null)
         true
       } else false)
-    val favoriteList = view.findView(TR.favorite)
-    favoriteList.setLayoutManager(new LinearLayoutManager(mainActivity))
+    val favoriteList = findView(TR.favorite)
+    favoriteList.setLayoutManager(new LinearLayoutManager(this))
     favoriteList.setItemAnimator(new DefaultItemAnimator)
-    favoritesAdapter = new FavoritesAdapter(view.findViewById(android.R.id.empty))
+    favoritesAdapter = new FavoritesAdapter(findViewById(android.R.id.empty))
     favoriteList.setAdapter(favoritesAdapter)
-    undoManager = new UndoSnackbarManager[FavoriteItem](view, favoritesAdapter.undo)
+    undoManager = new UndoSnackbarManager[FavoriteItem](favoriteList, favoritesAdapter.undo)
     new ItemTouchHelper(new SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
       ItemTouchHelper.START | ItemTouchHelper.END) {
       def onSwiped(viewHolder: ViewHolder, direction: Int) = {

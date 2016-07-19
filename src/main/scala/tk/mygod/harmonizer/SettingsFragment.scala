@@ -1,24 +1,13 @@
 package tk.mygod.harmonizer
 
-import android.app.Activity
 import android.os.Bundle
 import android.support.v7.preference.Preference
-import android.view.View
-import tk.mygod.app.ToolbarTypedFindView
-import tk.mygod.preference.{DropDownPreference, NumberPickerPreference, NumberPickerPreferenceDialogFragment, ToolbarPreferenceFragment}
+import tk.mygod.preference.{DropDownPreference, NumberPickerPreference, NumberPickerPreferenceDialogFragment, PreferenceFragmentPlus}
 
 /**
  * @author Mygod
  */
-final class SettingsFragment extends ToolbarPreferenceFragment {
-  override def layout = R.layout.fragment_settings
-
-  override def onViewCreated(view: View, savedInstanceState: Bundle) {
-    super.onViewCreated(view, savedInstanceState)
-    configureToolbar(R.string.settings)
-    setNavigationIcon(ToolbarTypedFindView.BACK)
-  }
-
+final class SettingsFragment extends PreferenceFragmentPlus {
   def onCreatePreferences(savedInstanceState: Bundle, rootKey: String) {
     getPreferenceManager.setSharedPreferencesName("settings")
     addPreferencesFromResource(R.xml.settings)
@@ -30,14 +19,8 @@ final class SettingsFragment extends ToolbarPreferenceFragment {
     findPreference("audio.bitDepth").asInstanceOf[DropDownPreference].setValue(config.getFormat.toString)
   }
 
-  override def onAttach(activity: Activity) {
-    //noinspection ScalaDeprecation
-    super.onAttach(activity)
-    activity.asInstanceOf[MainActivity].settingsFragment = this
-  }
-
   override def onDisplayPreferenceDialog(preference: Preference) =
     if (preference.isInstanceOf[NumberPickerPreference])
-      displayPreferenceDialog(new NumberPickerPreferenceDialogFragment(preference.getKey))
+      displayPreferenceDialog(preference.getKey, new NumberPickerPreferenceDialogFragment())
     else super.onDisplayPreferenceDialog(preference)
 }

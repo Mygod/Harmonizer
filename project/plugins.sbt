@@ -1,7 +1,5 @@
-logLevel := Level.Warn
+addSbtPlugin("org.scala-android" % "sbt-android" % "1.6.8")
 
-resolvers += Resolver.url("scalasbt releases", new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns)
-addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.5.19")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.10")
 
-resolvers += Resolver.url("rtimush/sbt-plugin-snapshots", new URL("https://dl.bintray.com/rtimush/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.9-6-g5a7705c")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")

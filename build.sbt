@@ -2,7 +2,7 @@ import android.Keys._
 
 android.Plugin.androidBuild
 
-platformTarget in Android := "android-23"
+platformTarget := "android-24"
 
 name := "Harmonizer"
 
@@ -12,8 +12,16 @@ javacOptions ++= Seq("-source", "1.6", "-target", "1.6")
 
 scalacOptions ++= Seq("-target:jvm-1.6", "-Xexperimental")
 
-shrinkResources in Android := true
+shrinkResources := true
+
+typedViewHolders := false
+
+resConfigs := Seq("zh")
+
+useSupportVectors
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "1.3.11-SNAPSHOT"
+libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "2.0.1-SNAPSHOT"
+
+proguardVersion := "5.2.1"
