@@ -25,3 +25,5 @@ resolvers += Resolver.sonatypeRepo("public")
 libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "2.0.1-SNAPSHOT"
 
 proguardVersion := "5.2.1"
+
+proguardCache := Seq()

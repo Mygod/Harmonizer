@@ -135,7 +135,8 @@ final class FavoritesActivity extends ToolbarActivity with CircularRevealActivit
     configureToolbar()
     setNavigationIcon()
     findView(TR.favorite_name_text).setOnEditorActionListener((textView, actionId, event) =>
-      if (actionId == EditorInfo.IME_ACTION_SEND) {
+      if (actionId == EditorInfo.IME_ACTION_SEND ||
+        event.getKeyCode == KeyEvent.KEYCODE_ENTER && event.getAction == KeyEvent.ACTION_DOWN) {
         favoritesAdapter.add(new FavoriteItem(textView.getText.toString, MainActivity.instance.getFrequency))
         textView.setText(null)
         true

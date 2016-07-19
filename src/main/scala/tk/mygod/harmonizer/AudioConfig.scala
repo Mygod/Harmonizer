@@ -20,8 +20,7 @@ object AudioConfig {
   try {
     val maxField = classOf[AudioTrack].getDeclaredField("SAMPLE_RATE_HZ_MAX")
     maxField.setAccessible(true)
-    val max = maxField.get(null).asInstanceOf[Int]
-    maxSamplingRate = max
+    maxSamplingRate = maxField.get(null).asInstanceOf[Int]
   } catch {
     case exc: NoSuchFieldException =>
   }
