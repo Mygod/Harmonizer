@@ -49,12 +49,11 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
     result
   }
   private def generateTrack(frequency: Double) = {
-    val rate = AudioConfig.samplingRate
-    val s10 = rate * 10
-    val minute = rate * 60
-    var max = if (frequency <= 0) 2 else (rate / frequency).toInt
+    val s10 = AudioConfig.sampleRate * 10
+    val minute = AudioConfig.sampleRate * 60
+    var max = if (frequency <= 0) 2 else (AudioConfig.sampleRate / frequency).toInt
     if (max < 16) max = 16 else if (max > minute) max = minute
-    val k = 3.14159265358979323846264338327950288 * 2 * frequency / rate
+    val k = 3.14159265358979323846264338327950288 * 2 * frequency / AudioConfig.sampleRate
     var i = 0
     AudioConfig.format match {
       case AudioFormat.ENCODING_PCM_8BIT =>
@@ -66,7 +65,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_8BIT, i, AudioTrack.MODE_STATIC)
         track.write(shift(byteBuffer, i), 0, i)
         byteBuffer.clear
@@ -81,7 +80,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
         track.write(shift(shortBuffer, i), 0, i)
         shortBuffer.clear
@@ -96,7 +95,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_FLOAT, i << 2, AudioTrack.MODE_STATIC)
         track.write(shift(floatBuffer, i), 0, i, AudioTrack.WRITE_BLOCKING)
         floatBuffer.clear
