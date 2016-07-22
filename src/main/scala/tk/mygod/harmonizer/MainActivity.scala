@@ -30,7 +30,6 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
   var frequencyText: AppCompatEditText = _
   private var pressed: Boolean = _
   private var muteNeedsNoting = true
-  private lazy val audioConfig = new AudioConfig(this)
   // recycling ArrayBuffer ;-)
   private var byteBuffer: ArrayBuffer[Byte] = _
   private var shortBuffer: ArrayBuffer[Short] = _
@@ -50,13 +49,14 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
     result
   }
   private def generateTrack(frequency: Double) = {
-    val s10 = audioConfig.samplingRate * 10
-    val minute = audioConfig.samplingRate * 60
-    var max = if (frequency <= 0) 2 else (audioConfig.samplingRate / frequency).toInt
+    val rate = AudioConfig.samplingRate
+    val s10 = rate * 10
+    val minute = rate * 60
+    var max = if (frequency <= 0) 2 else (rate / frequency).toInt
     if (max < 16) max = 16 else if (max > minute) max = minute
-    val k = 3.14159265358979323846264338327950288 * 2 * frequency / audioConfig.samplingRate
+    val k = 3.14159265358979323846264338327950288 * 2 * frequency / rate
     var i = 0
-    audioConfig.format match {
+    AudioConfig.format match {
       case AudioFormat.ENCODING_PCM_8BIT =>
         if (byteBuffer == null) byteBuffer = new ArrayBuffer[Byte](max) else byteBuffer.sizeHint(max)
         var last: Byte = -1
@@ -66,7 +66,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_8BIT, i, AudioTrack.MODE_STATIC)
         track.write(shift(byteBuffer, i), 0, i)
         byteBuffer.clear
@@ -81,7 +81,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
         track.write(shift(shortBuffer, i), 0, i)
         shortBuffer.clear
@@ -96,7 +96,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, audioConfig.samplingRate, AudioFormat.CHANNEL_OUT_MONO,
+        val track = new AudioTrack(AudioManager.STREAM_MUSIC, rate, AudioFormat.CHANNEL_OUT_MONO,
           AudioFormat.ENCODING_PCM_FLOAT, i << 2, AudioTrack.MODE_STATIC)
         track.write(shift(floatBuffer, i), 0, i, AudioTrack.WRITE_BLOCKING)
         floatBuffer.clear
@@ -119,6 +119,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
   protected override def onCreate(bundle: Bundle) {
     super.onCreate(bundle)
     instance = this
+    AudioConfig.init(this)
     setContentView(R.layout.activity_main)
     frequencyText = findView(TR.frequency_text)
     configureToolbar()
@@ -133,7 +134,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           pressed = true
           Future {
             val frequency = getFrequency
-            if (audioConfig.changed || savedFrequency != frequency) {
+            if (AudioConfig.changed || savedFrequency != frequency) {
               savedFrequency = frequency
               if (savedTrack != null) {
                 savedTrack.stop
