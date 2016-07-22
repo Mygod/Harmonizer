@@ -22,7 +22,7 @@ useSupportVectors
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "2.0.1-SNAPSHOT"
+libraryDependencies += "tk.mygod" %% "mygod-lib-android" % "2.0.1"
 
 proguardVersion := "5.2.1"
 
