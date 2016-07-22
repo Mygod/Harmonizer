@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="tk.mygod.harmonizer" android:versionCode="386" android:versionName="2.3.0">
+          package="tk.mygod.harmonizer" android:versionCode="401" android:versionName="2.3.1">
     <uses-sdk android:minSdkVersion="16"
               android:targetSdkVersion="24"
     />
