@@ -6,6 +6,8 @@
     <string name="frequency_hint">Frequency (Hz, default: 1000)</string>
     <string name="beep">BEEP</string>
     <string name="volume_off">Volume is off</string>
+    <string name="near_ultrasound_unsupported">No devices detected are able to playback ultrasound. You are probably
+        going to hear nothing when you set frequency to ~18 - 21kHz.</string>
     <string name="favorites">Favorites</string>
     <string name="drawer_open">Favorites opened.</string>
     <string name="drawer_close">Favorites closed.</string>

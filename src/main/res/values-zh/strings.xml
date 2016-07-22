@@ -5,6 +5,8 @@
     <string name="frequency_hint">频率（赫兹，默认：1000）</string>
     <string name="beep">哔</string>
     <string name="volume_off">音量未打开</string>
+    <string name="near_ultrasound_unsupported">未检测到支持播放近超声波的设备。当你将频率设置到 ~18 - 21kHz
+        时很可能将什么都听不见。</string>
     <string name="favorites">收藏夹</string>
     <string name="drawer_open">收藏夹已打开。</string>
     <string name="drawer_close">收藏夹已关闭。</string>
