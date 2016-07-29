@@ -1,12 +1,13 @@
 package tk.mygod.harmonizer
 
-import android.media.{AudioFormat, AudioManager, AudioTrack}
+import android.media.{AudioAttributes, AudioFormat, AudioManager, AudioTrack}
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.widget.AppCompatEditText
 import android.support.v7.widget.Toolbar.OnMenuItemClickListener
 import android.view.{KeyEvent, MenuItem, MotionEvent}
 import tk.mygod.app.{CircularRevealActivity, ToolbarActivity}
+import tk.mygod.os.Build
 import tk.mygod.view.LocationObserver
 
 import scala.collection.mutable.ArrayBuffer
@@ -21,12 +22,30 @@ object MainActivity {
 final class MainActivity extends ToolbarActivity with OnMenuItemClickListener with TypedFindView {
   import MainActivity._
 
+  def createTrack(bufferSize: Int = 16, encoding: Int = AudioFormat.ENCODING_PCM_8BIT) =
+    if (Build.version >= 21) new AudioTrack(
+      new AudioAttributes.Builder()
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED | AudioAttributes.FLAG_LOW_LATENCY)
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+        .build(),
+      new AudioFormat.Builder()
+        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+        .setEncoding(encoding)
+        .setSampleRate(AudioConfig.sampleRate)
+        .build(), bufferSize, AudioTrack.MODE_STATIC, 0)
+    else new AudioTrack(AudioManager.STREAM_SYSTEM, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO, encoding,
+      bufferSize, AudioTrack.MODE_STATIC)
+
+  private lazy val am = systemService[AudioManager]
   private var savedFrequency: Double = _
   private var savedTrack: AudioTrack = _
-  private val muteTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 48000, AudioFormat.CHANNEL_OUT_MONO,
-    AudioFormat.ENCODING_PCM_16BIT, 32, AudioTrack.MODE_STATIC)
-  muteTrack.write(new Array[Short](16), 0, 16)
-  muteTrack.setLoopPoints(0, 16, -1)
+  private lazy val muteTrack = {
+    val track = createTrack()
+    track.write(new Array[Byte](16), 0, 16)
+    track.setLoopPoints(0, 16, -1)
+    track
+  }
   var frequencyText: AppCompatEditText = _
   private var pressed: Boolean = _
   private var muteNeedsNoting = true
@@ -65,8 +84,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
-          AudioFormat.ENCODING_PCM_8BIT, i, AudioTrack.MODE_STATIC)
+        val track = createTrack(i)
         track.write(shift(byteBuffer, i), 0, i)
         byteBuffer.clear
         track.setLoopPoints(0, i, -1)
@@ -80,8 +98,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
-          AudioFormat.ENCODING_PCM_16BIT, i << 1, AudioTrack.MODE_STATIC)
+        val track = createTrack(i << 1, AudioFormat.ENCODING_PCM_16BIT)
         track.write(shift(shortBuffer, i), 0, i)
         shortBuffer.clear
         track.setLoopPoints(0, i, -1)
@@ -95,8 +112,7 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
           i += 1
         }
         i -= 1
-        val track = new AudioTrack(AudioManager.STREAM_MUSIC, AudioConfig.sampleRate, AudioFormat.CHANNEL_OUT_MONO,
-          AudioFormat.ENCODING_PCM_FLOAT, i << 2, AudioTrack.MODE_STATIC)
+        val track = createTrack(i << 2, AudioFormat.ENCODING_PCM_FLOAT)
         track.write(shift(floatBuffer, i), 0, i, AudioTrack.WRITE_BLOCKING)
         floatBuffer.clear
         track.setLoopPoints(0, i, -1)
@@ -143,9 +159,9 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
               savedTrack = generateTrack(frequency)
             }
             if (savedTrack != null && pressed) {
-              savedTrack.play
-              if (muteNeedsNoting && systemService[AudioManager]
-                .getStreamVolume(AudioManager.STREAM_MUSIC) <= 0) runOnUiThread(makeToast(R.string.volume_off).show)
+              savedTrack.play()
+              if (muteNeedsNoting && am.getStreamVolume(AudioManager.STREAM_SYSTEM) <= 0)
+                runOnUiThread(makeToast(R.string.volume_off).show)
               muteNeedsNoting = false
             }
           }
@@ -161,14 +177,14 @@ final class MainActivity extends ToolbarActivity with OnMenuItemClickListener wi
     super.onDestroy()
   }
 
-  protected override def onResume {
+  protected override def onResume() {
     super.onResume
-    muteTrack.play
+    muteTrack.play()
   }
 
-  protected override def onPause {
+  protected override def onPause() {
     super.onPause
-    muteTrack.pause
+    muteTrack.pause()
     stop
   }
 
